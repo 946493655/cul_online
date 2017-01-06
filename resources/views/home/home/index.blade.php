@@ -1,6 +1,6 @@
-@extends('home.main')
+@extends('layout.main')
 @section('content')
-    <div class="online_list" style="height:900px;background:rgb(40,40,40);">
+    <div class="online_list">
         <div style="margin-bottom:20px;text-align:center;color:dimgray;" id="promptInfo">
             <b>在这里，您就是下一位导演...</b>
             <script>
@@ -11,14 +11,11 @@
         </div>
         <div class="condition">
             @include('home.home.menu')
-            <div class="attr" style="height:{{count($model['cates'])>14?40:20}}px;">
+            <div class="attr" style="height:{{count($model['cates'])>13?40:20}}px;">
                 <div class="cate_s">模板类型：</div>
-                {{--<a href="" class="{{$cate==0?'curr':''}}">全部</a>--}}
-                {{--@foreach($model['cates'] as $kcate=>$vcate)--}}
-                    {{--<a href="" class="{{$cate==$kcate?'curr':''}}">{{ $vcate }}</a>--}}
-                {{--@endforeach--}}
+                <div class="{{$cate==0?'cate_curr':'cate_s'}}" onclick="jump(0)">所有</div>
                 @foreach($model['cates'] as $kcate=>$vcate)
-                <div class="cate_s {{$cate==$kcate?'curr':''}}">{{ $vcate }}</div>
+                <div class="{{$cate==$kcate?'cate_curr':'cate_s'}}" onclick="jump({{$kcate}})">{{ $vcate }}</div>
                 @endforeach
             </div>
         </div>
@@ -55,4 +52,14 @@
             <div style="margin-top:20px;">@include('layout.page')</div>
         </div>
     </div>
+
+    <script>
+        function jump(cate){
+            if (cate==0) {
+                window.location.href = '{{DOMAIN}}';
+            } else {
+                window.location.href = '{{DOMAIN}}s/'+cate;
+            }
+        }
+    </script>
 @stop

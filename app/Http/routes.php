@@ -18,21 +18,57 @@
 //Route::post('api/v1', function(){echo json_encode([]);exit;});
 
 
-
 /**
  * 作品大厅
  */
 Route::group(['prefix'=>'/','namespace'=>'Home'], function(){
     Route::get('/', 'HomeController@index');
-    Route::get('h/s/{cate}', 'HomeController@index');       //s代表检索
+    Route::get('s/{cate}', 'HomeController@index');       //s代表检索
     Route::resource('h', 'HomeController');
 });
 
 
 /**
+ * 用户登录
+ */
+Route::group(['prefix'=>'login'], function(){
+    Route::get('/', 'LoginController@index');
+    Route::post('dologin', 'LoginController@dologin');
+    Route::get('logout', 'LoginController@logout');
+});
+
+/**
  * 用户房间
  */
-Route::group(['prefix'=>'u/{uid}','namespace'=>'Mmeber'], function(){
-    Route::get('{cate}', 'HomeController@index');
-    Route::resource('/', 'HomeController');
+Route::group(['prefix'=>'u','middleware' =>'MemberAuth','namespace'=>'Member'], function(){
+    Route::get('product/s/{cate}', 'HomeController@index');
+    Route::get('product/apply/{tempid}', 'HomeController@getApply');
+    Route::post('product/{id}', 'HomeController@update');
+    Route::post('product/link/{id}', 'HomeController@set2Link');
+    Route::get('product/delete/{id}', 'HomeController@forceDelete');
+    Route::resource('product', 'HomeController');
+});
+
+
+/**************************************************/
+
+/**
+ * 系统后台登录
+ */
+Route::group(['prefix'=>'admin','namespace'=>'Admin'], function(){
+    Route::get('login', 'LoginController@index');
+    Route::post('dologin', 'LoginController@dologin');
+    Route::post('logout', 'LoginController@logout');
+});
+
+/**
+ * 系统后台
+ */
+Route::group(['prefix'=>'admin','middleware' =>'AdminAuth','namespace'=>'Admin'], function(){
+    Route::get('/', 'TempProController@index');
+    Route::post('temp/{id}', 'TempProController@update');
+    Route::post('temp/modifylink/{id}', 'TempProController@set2Link');
+    Route::post('temp/isshow/{id}/{isshow}', 'TempProController@setIsShow');
+    Route::post('temp/delete/{id}', 'TempProController@forceDelete');
+    Route::resource('temp', 'TempProController');
 });

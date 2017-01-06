@@ -1,6 +1,6 @@
 {{-- 这里是创作窗口 --}}
 
-@extends('home.main')
+@extends('layout.main')
 @section('content')
     <div class="content">
         <!-- 菜单栏 -->

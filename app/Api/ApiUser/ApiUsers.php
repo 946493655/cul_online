@@ -1,34 +1,44 @@
 <?php
-namespace App\Api\ApiOnline;
+namespace App\Api\ApiUser;
 
 use Curl\Curl;
 
-class ApiProduct
+class ApiUsers
 {
     /**
-     * 在线创作产品接口
+     * 用户接口
      */
 
     /**
-     * 列表
+     * 用户登录
      */
-    public static function index($limit=0,$pageCurr=1,$uid=0,$cate=0,$isshow=0)
+    public static function dologin($data)
     {
-        $redisKey = 'productList';
-        //判断缓存有没有该数据
-        if ($redisResult = ApiBase::getRedis($redisKey)) {
-            return array('code' => 0, 'data' => unserialize($redisResult));
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/user/dologin';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, $data);
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
         }
-        //没有，接口读取
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product';
+        return array(
+            'code' => 0,
+            'model' => ApiBase::objToArr($response->model),
+            'data' => ApiBase::objToArr($response->data),
+        );
+    }
+
+    /**
+     * 通过 uid 获取记录
+     */
+    public static function getOneUser($uid)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/user/show';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(
-            'limit' =>  $limit,
-            'page'  =>  $pageCurr,
-            'uid'   =>  $uid,
-            'cate'  =>  $cate,
-            'isshow'    =>  $isshow,
+            'uid'    =>  $uid,
         ));
         $response = json_decode($curl->response);
         if ($response->error->code != 0) {
@@ -42,16 +52,133 @@ class ApiProduct
     }
 
     /**
-     * 通过 uid、tempid 获取记录
+     * 通过 uname 获取记录
      */
-    public static function getProductBy2Id($uid,$tempid)
+    public static function getOneUserByUname($uname)
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/productby2id';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/user/oneuserbyuname';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(
-            'uid'   =>  $uid,
-            'tempid' =>  $tempid,
+            'uname'    =>  $uname,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
+            'model' => ApiBase::objToArr($response->model),
+            'data' => ApiBase::objToArr($response->data),
+        );
+    }
+
+    /**
+     * 根据 uid 获取个人信息
+     */
+    public static function getPersonInfo($uid)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/person/one';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'uid'    =>  $uid,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
+            'model' => ApiBase::objToArr($response->model),
+            'data' => ApiBase::objToArr($response->data),
+        );
+    }
+
+    /**
+     * 根据 uid 获取公司信息
+     */
+    public static function getOneCompany($uid)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/company/one';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'uid'    =>  $uid,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
+            'model' => ApiBase::objToArr($response->model),
+            'data' => ApiBase::objToArr($response->data),
+        );
+    }
+
+    /**
+     * 用户退出，更新日志
+     */
+    public static function logout($serial)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/log/logout';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'serial'    =>  $serial,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array('code' => 0, 'msg' => $response->error->msg);
+    }
+
+    /**
+     * 日志增加记录
+     */
+    public static function addLog($data)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/log/add';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, $data);
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array('code' => 0, 'msg' => $response->error->msg);
+    }
+
+    /**
+     * 用户、管理员退出，更新日志
+     */
+    public static function modifyLogout($serial)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/log/logout';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'serial'    =>  $serial,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array('code' => 0, 'msg' => $response->error->msg);
+    }
+
+    /**
+     * 根据 adminName 获取管理员记录
+     */
+    public static function getOneAdminByUname($uname)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/admin/getonebyuname';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'username'  =>  $uname,
         ));
         $response = json_decode($curl->response);
         if ($response->error->code != 0) {
@@ -60,117 +187,6 @@ class ApiProduct
         return array(
             'code' => 0,
             'data' => ApiBase::objToArr($response->data),
-            'model' => ApiBase::objToArr($response->model),
-        );
-    }
-
-    /**
-     * 通过 id、uid 获取记录
-     */
-    public static function getOneByUid($id,$uid)
-    {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/onebyuid';
-        $curl = new Curl();
-        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
-        $curl->post($apiUrl, array(
-            'id'    =>  $id,
-            'uid'   =>  $uid,
-        ));
-        $response = json_decode($curl->response);
-        if ($response->error->code != 0) {
-            return array('code' => -1, 'msg' => $response->error->msg);
-        }
-        return array(
-            'code' => 0,
-            'data' => ApiBase::objToArr($response->data),
-            'model' => ApiBase::objToArr($response->model),
-        );
-    }
-
-    /**
-     * 添加产品
-     */
-    public static function add($data)
-    {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/add';
-        $curl = new Curl();
-        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
-        $curl->post($apiUrl, $data);
-        $response = json_decode($curl->response);
-        if ($response->error->code != 0) {
-            return array('code' => -1, 'msg' => $response->error->msg);
-        }
-        return array('code' => 0, 'msg' => $response->error->msg);
-    }
-
-    /**
-     * 修改产品
-     */
-    public static function modify($data)
-    {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/modify';
-        $curl = new Curl();
-        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
-        $curl->post($apiUrl, $data);
-        $response = json_decode($curl->response);
-        if ($response->error->code != 0) {
-            return array('code' => -1, 'msg' => $response->error->msg);
-        }
-        return array('code' => 0, 'msg' => $response->error->msg);
-    }
-
-    /**
-     * 修改缩略图、视频链接
-     */
-    public static function modify2Link($data)
-    {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/modify2link';
-        $curl = new Curl();
-        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
-        $curl->post($apiUrl, $data);
-        $response = json_decode($curl->response);
-        if ($response->error->code != 0) {
-            return array('code' => -1, 'msg' => $response->error->msg);
-        }
-        return array('code' => 0, 'msg' => $response->error->msg);
-    }
-
-    /**
-     * 通过 uid、id 删除记录
-     */
-    public static function deleteBy2Id($uid,$id)
-    {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/deleteby2id';
-        $curl = new Curl();
-        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
-        $curl->post($apiUrl, array(
-            'uid'   =>  $uid,
-            'id' =>  $id,
-        ));
-        $response = json_decode($curl->response);
-        if ($response->error->code != 0) {
-            return array('code' => -1, 'msg' => $response->error->msg);
-        }
-        return array('code' => 0, 'msg' => $response->error->msg);
-    }
-
-    /**
-     * 获取 model
-     */
-    public static function getModel()
-    {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/getmodel';
-        $curl = new Curl();
-        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
-        $curl->post($apiUrl, array(
-        ));
-        $response = json_decode($curl->response);
-        if ($response->error->code != 0) {
-            return array('code' => -1, 'msg' => $response->error->msg);
-        }
-        return array(
-            'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
         );
     }
 }

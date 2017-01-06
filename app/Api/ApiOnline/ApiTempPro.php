@@ -9,7 +9,7 @@ class ApiTempPro
      * 在线创作模板接口
      */
 
-    public static function index($limit=0,$pageCurr=1,$cate=0)
+    public static function index($limit=0,$pageCurr=1,$cate=0,$isshow=0)
     {
         $redisKey = 'tempProList';
         //判断缓存有没有该数据
@@ -24,6 +24,30 @@ class ApiTempPro
             'limit' =>  $limit,
             'page'  =>  $pageCurr,
             'cate'  =>  $cate,
+            'isshow'  =>  $isshow,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
+            'model' => ApiBase::objToArr($response->model),
+            'data' => ApiBase::objToArr($response->data),
+        );
+    }
+
+    /**
+     * 根据 id、uid 获取记录
+     */
+    public static function getOneByShow($id,$isshow)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/getonebyshow';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'id'    =>  $id,
+            'isshow'   =>  $isshow,
         ));
         $response = json_decode($curl->response);
         if ($response->error->code != 0) {
@@ -56,6 +80,93 @@ class ApiTempPro
             'model' => ApiBase::objToArr($response->model),
             'data' => ApiBase::objToArr($response->data),
         );
+    }
+
+    /**
+     * 添加模板
+     */
+    public static function add($data)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/add';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, $data);
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array('code' => 0, 'msg' => $response->error->msg);
+    }
+
+    /**
+     * 修改模板
+     */
+    public static function modify($data)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/modify';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, $data);
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array('code' => 0, 'msg' => $response->error->msg);
+    }
+
+    /**
+     * 根据 id
+     * 更新模板缩略图、视频2个链接
+     * thumb、linkType、link
+     */
+    public static function modify2Link($data)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/modify2link';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, $data);
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array('code' => 0, 'msg' => $response->error->msg);
+    }
+
+    /**
+     * 根据 id 设置 isshow
+     */
+    public static function isShow($id,$isshow)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/isshow';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'id'    =>  $id,
+            'isshow'    =>  $isshow,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array('code' => 0, 'msg' => $response->error->msg);
+    }
+
+    /**
+     * 根据 id 销毁记录
+     */
+    public static function delete($id)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/delete';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'id'    =>  $id,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array('code' => 0, 'msg' => $response->error->msg);
     }
 
     /**

@@ -285,6 +285,8 @@ body { margin:0;font-family:'微软雅黑'; }
 /*========== 动画作品列表 ==========*/
 .online_list {
     margin:30px 0;
+    height:900px;
+    background:rgb(40,40,40);
 }
 .online_list .condition {
     padding:5px 10px;
@@ -304,18 +306,20 @@ body { margin:0;font-family:'微软雅黑'; }
     text-decoration:none;
     border:0;
 }
-.online_list .condition .attr .cate_s {
+.online_list .condition .cate_s,.online_list .condition .cate_curr {
     margin-right:5px;
     margin-bottom:3px;
     padding:0 5px;
-    color:grey;
     text-decoration:none;
     border:0;
     cursor:pointer;
     float:left;
 }
+.online_list .condition .cate_s {
+    color:grey;
+}
+.online_list .condition div:hover.cate_s,.online_list .condition div.cate_curr { color:orangered; }
 .online_list .condition a:hover,.online_list .condition a.curr { color:orangered; }
-.online_list .condition div:hover.cate_s,.online_list .condition div.curr { color:orangered; }
 .online_list .list {
     margin:20px auto;
     width:1000px;
@@ -347,6 +351,66 @@ body { margin:0;font-family:'微软雅黑'; }
     color:grey;
     font-size:14px;
 }
+.online_list .searchlist {
+    margin:10px auto;
+    padding:5px 10px;
+    width:960px;
+}
+.online_list .searchlist a {
+    margin-left:350px;
+    padding:5px 100px;
+    color:orangered;
+    text-decoration:none;
+    border:1px solid #333;
+    background:#232323;
+}
+.online_list .searchlist a:hover { border:1px solid #663333; }
+
+/*表单样式*/
+.editproduct { display:none; }
+.editproduct .mask {
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.5);
+    position:fixed;left:0;top:0;
+}
+.editproduct form,.editproduct .msg {
+    padding:0 15px;
+    width:500px;
+    color:grey;
+    background:white;
+    position:fixed;left:30%;top:150px;
+}
+.editproduct form input,.editproduct form select,.editproduct form textarea {
+    padding:10px;
+    width:475px;
+    border:1px solid lightgrey;
+    font-size:16px;
+}
+.editproduct form input#submit {
+    color:orangered;
+    font-weight:bold;
+    cursor:pointer;
+}
+.editproduct form a.close {
+    padding:10px 20px;
+    color:black;
+    text-decoration:none;
+    font-size:20px;
+    background:red;
+    position:absolute;top:0;left:530px;
+}
+.editproduct form a:hover.close { color:white; }
+.editproduct .msg a {
+    padding:5px 20px;
+    color:orangered;
+    text-decoration:none;
+    border:1px solid orangered;
+}
+.editproduct .msg a:hover {
+    background:lightgrey;
+}
+
 /*渲染列表*/
 .online_list table.list { color:grey; }
 .online_list table.list td {
@@ -361,17 +425,30 @@ body { margin:0;font-family:'微软雅黑'; }
     border:2px solid rgb(50,50,50);
     background:rgb(30,30,30);
     overflow:hidden;
-    cursor:pointer;
 }
 .online_list table.list #gettemp {
     margin:10px auto;
-    padding:5px 20px;
+    padding:10px 40px;
     width:100px;
     text-align:center;
     background:#000;
     cursor:pointer;
 }
 .online_list table.list div:hover#gettemp {
+    color:orangered;
+    background:#333;
+}
+.online_list table.list #editpro {
+    margin:20px auto;
+    text-align:center;
+}
+.online_list table.list #editpro a {
+    padding:10px 20px;
+    width:100px;
+    color:grey;
+    background:#000;
+}
+.online_list table.list #editpro a:hover {
     color:orangered;
     background:#333;
 }

@@ -18,7 +18,6 @@ class HomeController extends BaseController
 
     public function index($cate=0)
     {
-//        dd(ApiTempPro::index());
         $pageCurr = isset($_POST['pageCurr'])?$_POST['pageCurr']:1;
         $prefix_url = DOMAIN;
         $result = [
@@ -32,7 +31,7 @@ class HomeController extends BaseController
 
     public function show($id)
     {
-        $rst = ApiTempPro::show($id);
+        $rst = ApiTempPro::getOneByShow($id,2);
         if ($rst['code']!=0) {
             echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
         }
@@ -51,7 +50,7 @@ class HomeController extends BaseController
 
     public function query($pageCurr,$prefix_url,$cate=0)
     {
-        $rst = ApiTempPro::index($this->limit,$pageCurr,$cate);
+        $rst = ApiTempPro::index($this->limit,$pageCurr,$cate,2);
         $datas = $rst['code']==0?$rst['data']:[];
         $datas['pagelist'] = $this->getPageList($datas,$prefix_url,$this->limit,$pageCurr);
         return $datas;

@@ -1,5 +1,5 @@
 <?php
-namespace App\Api\ApiImg;
+namespace App\Api\ApiUser;
 
 use Redis;
 
@@ -14,8 +14,8 @@ class ApiBase
      */
     public static function getApiKey()
     {
-//        return env('API_KEY', 'isduc3IKO3TTN5JUf8uLcC3ZxIrszuO9');
-        return 'isduc3IKO3TTN5JUf8uLcC3ZxIrszuO9';
+//        return env('API_KEY', '3TTN5JUf8uLcC3ZxIrszuO9isduc3IKO');
+        return '3TTN5JUf8uLcC3ZxIrszuO9isduc3IKO';
     }
 
     /**
@@ -23,8 +23,8 @@ class ApiBase
      */
     public static function getApiCurl()
     {
-//        return env('API_CURL', 'img_api.jiugewenhua.com');
-        return 'img_api.jiugewenhua.com';
+//        return env('API_CURL', 'user_api.jiugewenhua.com');
+        return 'user_api.jiugewenhua.com';
     }
 
     /**

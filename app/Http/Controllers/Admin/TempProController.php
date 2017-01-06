@@ -1,14 +1,14 @@
 <?php
-namespace App\Http\Controllers\Member;
+namespace App\Http\Controllers\Admin;
 
 use App\Api\ApiOnline\ApiProduct;
+use App\Api\ApiOnline\ApiTempPro;
 use Illuminate\Http\Request;
-use Session;
 
-class HomeController extends BaseController
+class TempProController extends BaseController
 {
     /**
-     * 用户创作管理控制器
+     * 创作后台控制器
      */
 
     public function __construct()
@@ -19,51 +19,54 @@ class HomeController extends BaseController
     public function index($cate=0)
     {
         $pageCurr = isset($_POST['pageCurr'])?$_POST['pageCurr']:1;
-        $prefix_url = DOMAIN;
+        $prefix_url = DOMAIN.'admin/temp';
         $result = [
             'datas'=> $this->query($pageCurr,$prefix_url,$cate),
             'prefix_url'=> $prefix_url,
             'model'=> $this->getModel(),
             'cate'=> $cate,
         ];
-        return view('member.home.index', $result);
+        return view('admin.temp.index', $result);
     }
 
     public function store(Request $request)
     {
+        dd($request->all());
         $data = $this->getData($request);
-        $rst = ApiProduct::add($data);
+        $rst = ApiTempPro::add($data);
         if ($rst['code']!=0) {
             echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
         }
-        return redirect(DOMAIN.'u/product');
+        return redirect(DOMAIN.'admin/temp');
     }
 
     public function show($id)
     {
-        $rst = ApiProduct::getOneByUid($id,Session::get('user.uid'));
+        $rst = ApiTempPro::show($id);
         if ($rst['code']!=0) {
             echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
         }
         $result = [
-            'data'=> $rst['data'],
-            'model'=> $this->getModel(),
+            'data' => $rst['data'],
+            'model' => $this->getModel(),
         ];
-        return view('member.home.show', $result);
+        return view('admin.temp.show', $result);
     }
 
     public function update(Request $request,$id)
     {
+        dd($request->all());
         $data = $this->getData($request);
-        $rst = ApiProduct::modify($data);
+        $data['id'] = $id;
+        $rst = ApiTempPro::modify($data);
         if ($rst['code']!=0) {
             echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
         }
-        return redirect(DOMAIN.'u/product/'.$id);
+        return redirect(DOMAIN.'admin/temp/'.$id);
     }
 
     /**
-     * 设置图片、视频链接
+     * 设置2链接：thumb、linkType、link
      */
     public function set2Link(Request $request,$id)
     {
@@ -72,9 +75,9 @@ class HomeController extends BaseController
             echo "<script>alert('没有上传图片！');history.go(-1);</script>";exit;
         }
         //去除老图片
-        $rstProduct = ApiProduct::getOneByUid($id,Session::get('user.uid'));
-        if ($rstProduct['code']==0) {
-            $thumb = $rstProduct['data']['thumb'];
+        $rstTemp = ApiTempPro::show($id);
+        if ($rstTemp['code']==0) {
+            $thumb = $rstTemp['data']['thumb'];
             $imgArr = explode('/',$thumb);
             $imgStr = $imgArr[3].'/'.$imgArr[4].'/'.$imgArr[5].'/'.$imgArr[6];
             unlink($imgStr);
@@ -84,39 +87,43 @@ class HomeController extends BaseController
         if (!$linkArr) {
             echo "<script>alert('缩略图或视频链接有误！');history.go(-1);</script>";exit;
         }
+        dd($request->all());
         $data = [
             'thumb' =>  $linkArr['thumb'],
             'linkType'  =>  $linkArr['type'],
             'link'  =>  $linkArr['link'],
-            'id'    =>  $id,
-            'uid'   =>  Session::get('user.uid'),
         ];
-        $rst = ApiProduct::modify2Link($data);
+        $rst = ApiTempPro::modify2Link($data);
         if ($rst['code']!=0) {
             echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
         }
-        return redirect(DOMAIN.'u/product/'.$id);
+        return redirect(DOMAIN.'admin/temp/'.$id);
     }
 
     /**
-     * 删除产品
+     * 设置 isshow
+     */
+    public function setIsShow($id,$isshow)
+    {
+        $rst = ApiTempPro::isShow($id,$isshow);
+        if ($rst['code']!=0) {
+            echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
+        }
+        return redirect(DOMAIN.'admin/temp/'.$id);
+    }
+
+    /**
+     * 销毁记录
      */
     public function forceDelete($id)
     {
-        $rst = ApiProduct::deleteBy2Id(Session::get('user.uid'),$id);
+        $rst = ApiTempPro::delete($id);
         if ($rst['code']!=0) {
             echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
         }
-        return redirect(DOMAIN.'u/product');
+        return redirect(DOMAIN.'admin/temp');
     }
 
-    /**
-     *  获取模板
-     */
-    public function getApply($tempid)
-    {
-        dd(Session::get('user.uid'),$tempid);
-    }
 
 
 
@@ -124,29 +131,21 @@ class HomeController extends BaseController
 
     public function getData(Request $request)
     {
-        if (!Session::has('user')) {
-            echo "<script>alert('没有登录！');history.go(-1);</script>";exit;
-        }
         return array(
             'name'  =>  $request->name,
             'cate'  =>  $request->cate,
             'intro' =>  $request->intro,
-            'uid'   =>  Session::get('user.uid'),
-            'uname' =>  Session::get('user.username'),
         );
     }
 
     public function query($pageCurr,$prefix_url,$cate)
     {
-        $rst = ApiProduct::index($this->limit,$pageCurr,Session::get('user.uid'),$cate,0);
+        $rst = ApiTempPro::index($this->limit,$pageCurr,$cate);
         $datas = $rst['code']==0 ? $rst['data'] : [];
         $datas['pagelist'] = $this->getPageList($datas,$prefix_url,$this->limit,$pageCurr);
         return $datas;
     }
 
-    /**
-     * 获取 model
-     */
     public function getModel()
     {
         $rst = ApiProduct::getModel();

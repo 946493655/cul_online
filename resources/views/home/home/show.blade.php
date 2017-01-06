@@ -1,7 +1,9 @@
-@extends('home.main')
+@extends('layout.main')
 @section('content')
-    <div class="online_list" style="height:900px;background:rgb(40,40,40);">
-        <div class="condition">@include('home.home.menu')</div>
+    <div class="online_list">
+        <div class="condition">
+            @include('home.home.menu')
+        </div>
 
         <table class="list">
             <tr><td colspan="2">模板编号：{{$data['serial']}}</td></tr>
@@ -17,7 +19,9 @@
                     @if($data['linkType']==4)</a>@endif
                     <input type="hidden" name="linkType" value="{{$data['linkType']}}">
                     <input type="hidden" name="link" value="{{$data['link']}}">
-                    <div id="gettemp">获取此模板</div>
+                    <input type="hidden" name="id" value="{{$data['id']}}">
+                    <input type="hidden" name="uid" value="{{Session::has('user')?Session::get('user.uid'):0}}">
+                    <div id="gettemp" onclick="getTemp()">获取此模板</div>
                 </td></tr>
         </table>
     </div>
@@ -31,6 +35,12 @@
             } else {
                 window.location.href = link;
             }
+        }
+        function getTemp(){
+            var id = $("input[name='id']").val();
+            var uid = $("input[name='uid']").val();
+            if (uid==0) { alert('还没有登录！');return; }
+            window.location.href = '{{DOMAIN}}u/product/apply/'+id;
         }
     </script>
 @stop
