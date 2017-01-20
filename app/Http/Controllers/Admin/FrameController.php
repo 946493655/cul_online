@@ -221,9 +221,19 @@ class FrameController extends BaseController
      */
     public function getPreLayer($tempid,$layerid)
     {
-//        dd($tempid,$layerid);
+        $apiLayer = ApiTempFrame::index($tempid,$layerid,0);
+        if (!$tempid) {}
         $result = [];
-        return view('admin.frame.onelayer',$result);
+        return view('admin.frame.onelayer');
+    }
+
+    /**
+     * 动画层的key-value载入
+     */
+    public function getKeyVals($tempid,$layerid)
+    {
+        $result = [];
+        return view('admin.frame.keyval',$result);
     }
 
 

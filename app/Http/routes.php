@@ -90,5 +90,6 @@ Route::group(['prefix'=>'admin','middleware' =>'AdminAuth','namespace'=>'Admin']
         Route::get('frame/save', 'FrameController@saveRedisToDB');
         Route::resource('frame', 'FrameController');
         Route::get('prelayer', 'FrameController@getPreLayer');
+        Route::get('keyvals', 'FrameController@getKeyVals');
     });
 });

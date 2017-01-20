@@ -22,9 +22,9 @@
                                 <a href="{{DOMAIN}}admin/temp/preview/{{$temp['id']}}"
                                    title="预览整体动画效果">预览整体</a>
                                 &nbsp; | &nbsp;
-                                <a href="javascript:;" title="预览当前动画片段" target="_blank"
-                                   onclick="getPreLayer({{count($datas)?$datas[0]['id']:0}})"
-                                   >预览[{{count($datas)?$datas[0]['name']:0}}]</a> &nbsp;
+                                <a href="{{DOMAIN}}admin/t/{{$temp['id']}}/{{count($datas)?$datas[0]['id']:0}}/prelayer"
+                                   title="预览当前动画片段" target="_blank">
+                                    预览[{{count($datas)?$datas[0]['name']:0}}]</a> &nbsp;
                             </span>
                         </p>
                         @if(!count($datas))
@@ -75,8 +75,5 @@
         }
         function getEditPro1(){ $("#editproduct1").show(); }
         function closeEditPro1(){ $("#editproduct1").hide(); }
-        function getPreLayer(layerid){
-            window.location.href = '{{DOMAIN}}admin/t/{{$temp['id']}}/'+layerid+'/prelayer';
-        }
     </script>
 @stop
