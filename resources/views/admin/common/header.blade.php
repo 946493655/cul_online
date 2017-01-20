@@ -6,7 +6,7 @@
           <div class="head_left">
               @if(Session::has('admin'))
                   <a href="{{DOMAIN}}u/product" style="color:orangered;">{{ Session::get('admin.username') }}系统管理</a> &nbsp;
-                  <a href="{{DOMAIN}}admin/dologout" style="color:orangered;">退出</a>
+                  <a href="{{DOMAIN}}admin/logout" style="color:orangered;">退出</a>
               @else
                   <a href="{{DOMAIN}}admin" style="color:orangered;">管理员登录</a>
               @endif

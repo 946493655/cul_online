@@ -21,6 +21,7 @@
     <div class="login">
         <form action="/admin/dologin" method="POST" data-am-validator>
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="_method" value="POST">
             <div class="login_div login_first"><input type="text" placeholder="管理员名称" minlength="2" maxlength="20" name="uname" required></div>
             <div class="login_div"><input type="password" placeholder="密码(至少5位)" minlength="5" maxlength="20" name="password" required></div>
             <div>&nbsp;</div>

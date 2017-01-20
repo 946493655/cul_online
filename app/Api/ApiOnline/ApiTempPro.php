@@ -38,6 +38,27 @@ class ApiTempPro
     }
 
     /**
+     * 获取所有数据
+     */
+    public static function all()
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/all';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
+            'model' => ApiBase::objToArr($response->model),
+            'data' => ApiBase::objToArr($response->data),
+        );
+    }
+
+    /**
      * 根据 id、uid 获取记录
      */
     public static function getOneByShow($id,$isshow)
@@ -167,6 +188,46 @@ class ApiTempPro
             return array('code' => -1, 'msg' => $response->error->msg);
         }
         return array('code' => 0, 'msg' => $response->error->msg);
+    }
+
+    /**
+     * 清空表
+     */
+    public static function clear($adminName)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/cleartable';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'adminName' =>  $adminName,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array('code' => 0, 'msg' => $response->error->msg);
+    }
+
+    /**
+     * 预览动画
+     */
+    public static function getPreview($id)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/getpreview';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'id' =>  $id,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
+            'model' => ApiBase::objToArr($response->model),
+            'data' => ApiBase::objToArr($response->data),
+        );
     }
 
     /**

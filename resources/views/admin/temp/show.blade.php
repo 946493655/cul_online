@@ -32,8 +32,8 @@
                         @endif
                         <a href="@if($data['linkType']==4){{$data['link']}}@else javascript:void(0);@endif"
                            @if($data['linkType']==4)target="_blank"@elseonclick="getPlay()"@endif>播放</a>
-                        <a href="">预览动画</a>
-                        <a href="">修改动画</a>
+                        <a href="{{DOMAIN}}admin/temp/preview/{{$data['id']}}">预览动画</a>
+                        <a href="{{DOMAIN}}admin/t/{{$data['id']}}/layer">修改动画</a>
                         <a href="javascript:void(0);" onclick="getDel()">删除产品</a>
                     </div>
                 </td></tr>
@@ -42,7 +42,7 @@
     {{--弹出框：添加缩略图、视频链接--}}
     <div class="editproduct" id="editproduct2">
         <div class="mask"></div>
-        <form action="{{DOMAIN}}u/product/link/{{$data['id']}}" method="POST"
+        <form action="{{DOMAIN}}admin/temp/link/{{$data['id']}}" method="POST"
               data-am-validator enctype="multipart/form-data">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="_method" value="POST">
@@ -69,7 +69,7 @@
     {{--弹出框：修改产品数据--}}
     <div class="editproduct" id="editproduct1">
         <div class="mask"></div>
-        <form action="{{DOMAIN}}u/product/{{$data['id']}}" method="POST" data-am-validator>
+        <form action="{{DOMAIN}}admin/temp/{{$data['id']}}" method="POST" data-am-validator>
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="_method" value="POST">
             <p style="text-align:center"><b>{{$data['name']}} 产品修改</b></p>
@@ -117,10 +117,19 @@
             }
         }
         function getEditPro1(){ $("#editproduct1").show(); }
-        function closeEditPro1(){ $("#editproduct1").hide(); }
+        function closeEditPro1(){
+//            $("#editproduct1").hide();
+            window.location.href = '';
+        }
         function getEditPro2(){ $("#editproduct2").show(); }
-        function closeEditPro2(){ $("#editproduct2").hide(); }
+        function closeEditPro2(){
+//            $("#editproduct2").hide();
+            window.location.href = '';
+        }
         function getDel(){ $("#editproduct3").show(); }
-        function closeEditPro3(){ $("#editproduct3").hide(); }
+        function closeEditPro3(){
+//            $("#editproduct3").hide();
+            window.location.href = '';
+        }
     </script>
 @stop

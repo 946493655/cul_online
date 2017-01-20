@@ -14,7 +14,7 @@ class Controller extends BaseController
 
     protected $limit = 20;          //每页显示记录数
     protected $model;
-    protected $redisTime = 60 * 2;       //session在redis中缓存时长，单位分钟，默认2小时
+    protected $redisTime = 60 * 60 * 2;       //session在redis中缓存时长，单位秒，默认2小时
     protected $uploadSizeLimit = 1 * 1024 * 1023;       //限制上传图片尺寸1M
     protected $suffix_img = [       //图片允许后缀
         "png", "jpg", "gif", "bmp", "jpeg", "jpe",
@@ -105,10 +105,10 @@ class Controller extends BaseController
     /**
      * 上传方法，并处理文件
      */
-    public function upload($file)
+    public function upload($file,$suffix)
     {
         if($file->isValid()){
-            $allowed_extensions = $this->suffix_img;
+            $allowed_extensions = $suffix;
             if ($file->getClientOriginalExtension() &&
                 !in_array($file->getClientOriginalExtension(), $allowed_extensions)) {
                 echo "<script>alert('你的图片格式不对！');history.go(-1);</script>";exit;
@@ -126,9 +126,10 @@ class Controller extends BaseController
     }
 
     /**
-     * 图片上传，返回图片地址
+     * 图片、视频链接
+     * 图片上传，返回图片地址的数组
      */
-    public function uploadImg($request,$imgName='url_ori')
+    public function uploadImg($request,$imgName='url_ori',$oldImg)
     {
         //判断视频链接
         $linkType = $request->linkType;
@@ -142,6 +143,7 @@ class Controller extends BaseController
         }
         //判断图片存在
         if($request->hasFile($imgName)){
+            if ($oldImg) { unlink($oldImg); }       //去除老图片
             foreach ($_FILES as $img) {
                 if ($img['size'] > $this->uploadSizeLimit) {
                     echo "<script>alert('上传的图片不能大于1M，请重新选择！');history.go(-1);</script>";exit;
@@ -150,12 +152,35 @@ class Controller extends BaseController
             $file = $request->file($imgName);           //获取图片
             $prefix_url = rtrim(env('DOMAIN'),'/');     //图片访问前缀
             return array(
-                'thumb' =>  $prefix_url.$this->upload($file),
+                'thumb' =>  $prefix_url.$this->upload($file,$this->suffix_img),
                 'linkType'  =>  $linkType,
                 'link'  =>  $link,
             );
         } else {
             return array();
+        }
+    }
+
+    /**
+     * 只上传图片，返回图片地址
+     */
+    public function uploadOnlyImg($request,$imgName='url_ori',$oldImgArr=[])
+    {
+        if($request->hasFile($imgName)){        //判断图片存在
+            //去除老图片
+            if ($oldImgArr) {
+                foreach ($oldImgArr as $oldImg) { unlink($oldImg); }
+            }
+            foreach ($_FILES as $img) {
+                if ($img['size'] > $this->uploadSizeLimit) {
+                    echo "<script>alert('上传的图片不能大于1M，请重新选择！');history.go(-1);</script>";exit;
+                }
+            }
+            $file = $request->file($imgName);           //获取图片
+            $prefix_url = rtrim(env('DOMAIN'),'/');     //图片访问前缀
+            return $prefix_url.$this->upload($file,$this->suffix_img);
+        } else {
+            return '';
         }
     }
 }

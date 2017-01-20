@@ -1,0 +1,337 @@
+<style>
+    body { margin:0;padding:0;font-family:'微软雅黑'; }
+    /*===div的滚动条修改===*/
+    #menu ::-webkit-scrollbar { width:20px;height:0px; }
+    #menu ::-webkit-scrollbar-corner { background:transparent; }
+    /*===input的color默认颜色更改===*/
+    input[type="color"] { padding:0;height:20px;border:0;cursor:pointer;position:relative;top:6px; }
+    ::-webkit-color-swatch { padding:0 25px;height:15px;border:2px solid grey;position:relative;top:-6px;left:-7px; }
+
+    /*右侧菜单面板*/
+    #menu { margin-top:5px;padding:5px;padding-bottom:20px;width:190px;height:450px;color:grey;background:black;overflow:scroll;position:relative;top:-460px;left:800px; }
+    #menu #title { width:200px;color:#4d4d4d;position:fixed;top:0px;background:black; }
+    #menu .menu { margin:0;padding:5px 0;padding-left:10px;border-bottom:1px dashed #212121; }
+    #menu a { color:grey;text-decoration:none; }
+    #menu a:hover { color:orangered; }
+    #menu .menutab { padding:5px;padding-left:10px;color:grey;display:none; }
+    #menu .menutab p { margin:0;padding:0; }
+    #menu input,#menu select { margin:2px 0;padding:2px 5px;width:30px;border:0;color:orangered;font-size:16px;background:#333; }
+    #menu select { width:70px; }
+    #menu input.radio { margin:0;padding:0;width:10px; }
+    #menu textarea { margin:5px 0;padding:5px;width:140px;height:100px;border:1px solid #333;border-radius:3px;color:orangered;background:#333;resize:none; }
+    #menu input[type="submit"] { width:80px;border:1px solid #333; }
+    #menu input[type="submit"]:hover { border:1px solid #660000; }
+    #submit { margin-left:5px;margin-top:10px; }
+    #submit .submit { padding:5px 10px;width:75px;font-size:14px;color:lightgrey;background:#333;cursor:pointer; }
+    /*动画窗口*/
+    #iframe { width:800px;height:450px;background:grey;overflow:hidden; }
+    #iframe #attr_default { margin:100px auto;padding:5px;width:300px;height:100px;color:grey;background:white;overflow:hidden; }
+    #iframe #attr {
+        margin:100px auto;padding:5px;
+        overflow:hidden;
+    @if($attrs)
+        width:{{$attrs['width']?$attrs['width']:'300'}}px;
+        height:{{$attrs['height']?$attrs['height']:'100'}}px;
+        @if($attrs['isborder']) border:{{$attrs['border1'].'px '.$model['border2s'][$attrs['border2']].' '.$attrs['border3']}}; @endif
+        @if($attrs['isbg']) background:{{$attrs['bg']}}; @endif
+        @if($attrs['iscolor']) color:{{$attrs['color']}}; @endif
+        @if($attrs['fontsize']) font-size:{{$attrs['fontsize'].'px'}}; @endif
+    @endif
+    }
+</style>
+
+
+{{--动画窗口--}}
+<div id="iframe">
+@if(!$layers)
+    <div style="text-align:center;line-height:420px;color:#333;">没有记录...</div>
+@else
+    <div id="{{$attrs?'attr':'attr_default'}}">
+        @if($cons && $cons['iscon']==1) {{$cons['text']}}
+        @elseif($cons && $cons['iscon']==2) <img src="{{$cons['img']}}">
+        @else 文字待输入...
+        @endif
+    </div>
+@endif
+</div>
+
+
+{{--菜单面板--}}
+<div id="menu">
+    <div class="menu" id="title"><b>属性菜单：</b><span style="font-size:12px">(鼠标滚动)</span></div>
+@if($layers)
+    {{--下面是菜单--}}
+    <div style="height:35px;"></div>
+    <div class="menu"><a href="javascript:;" title="点击切换" onclick="getMenu(1)">动画设置：</a>
+        <div class="menutab" id="menu1" style="display:{{((isset($menutab)&&$menutab==1)||!isset($menutab))?'block':'none'}};">
+            名称：<input type="text" minlength="2" maxlength="20" required style="width:80px" name="name" value="{{$layers['name']}}" onchange="setLayer()">
+            <br>
+            起始时间：<input type="text" pattern="^\d+$" required name="delay" value="{{$layers['delay']}}" onchange="setLayer()"> s
+            <br>
+            时 长：<input type="text" pattern="^[1-9]+$" required name="timelong" value="{{$layers['timelong']}}" onchange="setLayer()"> s
+        </div>
+    </div>
+    <div class="menu"><a href="javascript:;" title="点击切换" onclick="getMenu(2)">样式属性：</a>
+        <div class="menutab" id="menu2" style="display:{{(isset($menutab)&&$menutab==2)?'block':'none'}};">
+            <p>宽度：<input type="text" name="width" style="width:50px;" value="{{(isset($attrs['width'])&&$attrs['width'])?$attrs['width']:'300'}}" onchange="setAttr()"> px</p>
+
+            <p>高度：<input type="text" name="height" style="width:50px;" value="{{(isset($attrs['height'])&&$attrs['height'])?$attrs['height']:'100'}}" onchange="setAttr()"> px</p>
+
+            <p>边框： <label><input type="radio" class="radio" name="isborder0" value="0" @if(isset($attrs['isborder'])){{!$attrs['isborder']?'checked':''}}@else{{'checked'}}@endif onclick="isborder(0)" onchange="setAttr()">无 </label>
+            <label><input type="radio" class="radio" name="isborder1" value="1" @if(isset($attrs['isborder'])){{$attrs['isborder']?'checked':''}}@endif onclick="isborder(1)" onchange="setAttr()">有 </label></p>
+            <div id="isborder" style="display:{{(isset($attrs['isborder'])&&$attrs['isborder'])?'block':'none'}};">
+                <input type="hidden" name="isborder" value="{{(isset($attrs['isborder'])&&$attrs['isborder'])?$attrs['isborder']:0}}">
+                <p>&nbsp;&nbsp;
+                    <input type="text" required name="border1" value="{{(isset($attrs['border1'])&&$attrs['border1'])?$attrs['border1']:1}}" onchange="setAttr()"> px,
+                    <select name="border2" onchange="setAttr()">
+                        @foreach($model['border2names'] as $kborder2=>$vborder2)
+                            <option value="{{$kborder2}}" {{(isset($attrs['border2'])&&$attrs['border2']==$kborder2)?'selected':''}}>{{$vborder2}}</option>
+                        @endforeach
+                    </select>
+                </p>
+                {{--<p>&nbsp;&nbsp;--}}
+                    {{--原颜色：@if(isset($attrs['isborder'])&&$attrs['isborder']&&isset($attrs['border3'])&&$attrs['border3'])<a href="javascript:;" style="padding:0 15px;border:2px solid #333;font-size:12px;background:{{$attrs['border3']}};"></a>@else 默认 @endif--}}
+                {{--</p>--}}
+                <p style="position:relative;top:-6px;">&nbsp;&nbsp;
+                    选颜色：<input type="color" title="点击选择颜色" value="{{(isset($attrs['border3'])&&$attrs['border3'])?$attrs['border3']:'#ff0000'}}" onchange="setBoderColor(this.value)">
+                    <input type="hidden" name="border3" value="{{(isset($attrs['border3'])&&$attrs['border3'])?$attrs['border3']:'#ff0000'}}">
+                </p>
+            </div>
+
+            <p>背景色：<label><input type="radio" class="radio" name="isbg0" value="0" @if(isset($attrs['isbg'])){{!$attrs['isbg']?'checked':''}}@endif onclick="isbg(0)" onchange="setAttr()">无 </label>
+            <label><input type="radio" class="radio" name="isbg1" value="1" @if(isset($attrs['isbg'])){{$attrs['isbg']?'checked':''}}@else{{'checked'}}@endif onclick="isbg(1)" onchange="setAttr()">有 </label></p>
+            <div id="isbg" style="display:{{((isset($attrs['isbg'])&&$attrs['isbg'])||!isset($attrs['isbg']))?'block':'none'}};">
+                <input type="hidden" name="isbg" value="{{(isset($attrs['isbg'])&&$attrs['isbg'])?$attrs['isbg']:1}}">
+                {{--<p>&nbsp;&nbsp;--}}
+                    {{--原颜色：@if(isset($attrs['isbg'])&&$attrs['isbg']&&isset($attrs['bg'])&&$attrs['bg'])<a href="javascript:;" style="padding:0 15px;border:2px solid #333;font-size:12px;background:{{$attrs['bg']}};">&nbsp;</a>@else 默认 @endif--}}
+                {{--</p>--}}
+                <p style="position:relative;top:-6px;">&nbsp;&nbsp;
+                    选颜色：<input type="color" title="点击选择颜色" value="{{(isset($attrs['bg'])&&$attrs['bg'])?$attrs['bg']:'#ffffff'}}" onchange="setBgColor(this.value)">
+                    <input type="hidden" name="bg" value="{{(isset($attrs['bg'])&&$attrs['bg'])?$attrs['bg']:'#ffffff'}}">
+                </p>
+            </div>
+
+            <p>字颜色：<label><input type="radio" class="radio" name="iscolor0" value="0" @if(isset($attrs['iscolor'])){{!$attrs['iscolor']?'checked':''}}@else{{'checked'}}@endif onclick="iscolor(0)" onchange="setAttr()">默认 </label>
+            <label><input type="radio" class="radio" name="iscolor1" value="1" @if(isset($attrs['iscolor'])){{$attrs['iscolor']?'checked':''}}@endif onclick="iscolor(1)" onchange="setAttr()">有 </label></p>
+            <div id="iscolor" style="display:{{(isset($attrs['iscolor'])&&$attrs['iscolor'])?'block':'none'}};">
+                <input type="hidden" name="iscolor" value="{{(isset($attrs['iscolor'])&&$attrs['iscolor'])?$attrs['iscolor']:0}}">
+                {{--<p>&nbsp;&nbsp;--}}
+                    {{--原颜色：@if(isset($attrs['iscolor'])&&$attrs['iscolor']&&isset($attrs['color'])&&$attrs['color'])<a href="javascript:;" style="padding:0 15px;border:2px solid #333;font-size:12px;background:{{$attrs['color']}};"></a>@else 默认 @endif--}}
+                {{--</p>--}}
+                <p style="position:relative;top:-6px;">&nbsp;&nbsp;
+                    选颜色：<input type="color" title="点击选择颜色" value="{{(isset($attrs['color'])&&$attrs['color'])?$attrs['color']:'#000000'}}" onchange="setFontColor(this.value)">
+                    <input type="hidden" name="color" value="{{(isset($attrs['color'])&&$attrs['color'])?$attrs['color']:'#000000'}}">
+                </p>
+            </div>
+
+            <p>字大小：<input type="text" title="可输入12~30px" name="fontsize" style="width:50px;" value="{{(isset($attrs['fontsize'])&&$attrs['fontsize'])?$attrs['fontsize']:'16'}}" onchange="setAttr()"> px</p>
+            <p style="font-size:12px;">注：未填选的代表默认</p>
+        </div>
+    </div>
+    <div class="menu"><a href="javascript:;" title="点击切换" onclick="getMenu(3);">内容：</a>
+        <div class="menutab" id="menu3" style="display:{{(isset($menutab)&&$menutab==3)?'block':'none'}};">
+            <label><input type="radio" class="radio" name="iscon1" value="1" {{((isset($cons['iscon'])&&$cons['iscon']==1)||!isset($cons['iscon']))?'checked':''}} onclick="getCon(1)"> 文字 </label>
+            <label><input type="radio" class="radio" name="iscon2" value="2" {{(isset($cons['iscon'])&&$cons['iscon']==2)?'checked':''}} onclick="getCon(2)"> 图片 </label>
+            <input type="hidden" name="iscon" value="{{(isset($cons['iscon'])&&$cons['iscon']==2)?$cons['iscon']:1}}">
+
+            <span id="istext"><br>
+                <textarea name="text" id="text" onchange="setText()">{{(isset($cons['iscon'])&&$cons['iscon']==1&&$cons['text'])?$cons['text']:'文字待输入...'}}</textarea>
+            </span>
+
+            <form action="{{DOMAIN}}admin/t/{{$temp['id']}}/layer/toimg/{{$layers['id']}}" method="POST" data-am-validator enctype="multipart/form-data" id="isimg" style="display:none;">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="POST">
+                <input type="hidden" name="tempid" value="{{$temp['id']}}">
+                <input type="hidden" name="layerid" value="{{$layers['id']}}">
+                <script src="{{PUB}}assets/js/local_pre.js"></script>
+                <input type="button" class="submit" value="[ 找图 ]" onclick="path.click()" style="width:90px;"><br>
+                <input type="file" id="path" style="display:none" onchange="url_file.value=this.value;loadImageFile();" name="url_ori">
+                <input type="text" placeholder="本地图片地址" name="url_file" readonly style="width:150px;">
+                <div id="preview" style="width:100px;height:100px;border:1px dotted grey;
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale);"></div>
+                <input type="submit" title="点击确定更新" value="确定上传">
+            </form>
+        </div>
+    </div>
+    <div id="submit">
+        <a href="javascript:;" title="点击取消修改" class="submit" onclick="cancel()">取消修改</a>
+        <a href="javascript:;" title="点击确定修改" class="submit" onclick="save()">确定修改</a>
+    </div>
+    <div style="height:50px;"></div>
+@else
+    <div class="menu"><a href="javascript:;">待添加...</a></div>
+@endif
+</div>
+
+
+<script src="{{PUB}}assets/js/jquery-1.10.2.min.js"></script>
+<script>
+    function getMenu(tab){
+        var t = 100;
+        $("#menu"+tab).toggle(t);
+        if (tab==1) {
+            $("#menu2").hide(t);
+            $("#menu3").hide(t);
+        } else if (tab==2) {
+            $("#menu1").hide(t);
+            $("#menu3").hide(t);
+        } else if (tab==3) {
+            $("#menu1").hide(t);
+            $("#menu2").hide(t);
+            setText();
+        }
+    }
+    function isborder(tab){
+        $("input[name='isborder']")[0].value = tab;
+        if (tab==0) {
+            $("#isborder").hide();
+        } else {
+            $("#isborder").show();
+        }
+    }
+    function setBoderColor(val){    //设置边框颜色
+        $("input[name='border3']")[0].value = val; setAttr();
+    }
+    function isbg(tab){
+        $("input[name='isbg']")[0].value = tab;
+        if (tab==0) {
+            $("#isbg").hide();
+        } else {
+            $("#isbg").show();
+        }
+    }
+    function setBgColor(val){       //设置背景颜色
+        $("input[name='bg']")[0].value = val; setAttr();
+    }
+    function iscolor(tab){
+        $("input[name='iscolor']")[0].value = tab;
+        if (tab==0) {
+            $("#iscolor").hide();
+        } else {
+            $("#iscolor").show();
+        }
+    }
+    function setFontColor(val){       //设置文字颜色
+        $("input[name='color']")[0].value = val; setAttr();
+    }
+    function getCon(tab){
+        $("input[name='iscon']")[0].value = tab;
+        if (tab==1) {
+            $("#istext").show();
+            $("#isimg").hide();
+            setText();
+        } else {
+            $("#istext").hide();
+            $("#isimg").show();
+        }
+    }
+
+    $.ajaxSetup({headers : {'X-CSRF-TOKEN':$('input[name="_token"]').val()}});
+    var layerid = $("input[name='layerid']").val();
+    var tempid = $("input[name='tempid']").val();
+    //ajax更新动画设置数据
+    function setLayer(){
+        var name = $("input[name='name']").val();
+        var delay = $("input[name='delay']").val();
+        var timelong = $("input[name='timelong']").val();
+        var data = {
+            'tempid':tempid,
+            'layerid':layerid,
+            'name':name,
+            'delay':delay,
+            'timelong':timelong
+        };
+        $.ajax({
+            type: 'POST',
+            url: '/admin/t/'+tempid+'/layer/tolayer',
+            data: data,
+            dataType: 'json',
+            success: function(data) {
+                if (data.code!=0) {
+                    alert(data.msg);return;
+                }
+                window.location.href = '';
+            }
+        });
+    }
+    //ajax更新属性数据
+    function setAttr(){
+        var width = $("input[name='width']").val();
+        var height = $("input[name='height']").val();
+        var isborder = $("input[name='isborder']").val();
+        var border1 = $("input[name='border1']").val();
+        var border2 = $("select[name='border2']").val();
+        var border3 = $("input[name='border3']").val();
+        var isbg = $("input[name='isbg']").val();
+        var bg = $("input[name='bg']").val();
+        var iscolor = $("input[name='iscolor']").val();
+        var color = $("input[name='color']").val();
+        var fontsize = $("input[name='fontsize']").val();
+        //判断边框颜色、背景颜色、文字颜色
+        var border2_ok = $("input[name='border2_ok']").val();
+        var bg_ok = $("input[name='bg_ok']").val();
+        var color_ok = $("input[name='color_ok']").val();
+        if (isborder && border2_ok) { border2 = border2_ok; }
+        if (isbg && bg_ok) { bg = bg_ok; }
+        if (iscolor && color_ok) { color = color_ok; }
+        var data = {
+            'tempid':tempid,
+            'layerid':layerid,
+            'width':width,
+            'height':height,
+            'isborder':isborder,
+            'border1':border1,
+            'border2':border2,
+            'border3':border3,
+            'isbg':isbg,
+            'bg':bg,
+            'iscolor':iscolor,
+            'color':color,
+            'fontsize':fontsize
+        };
+        $.ajax({
+            type: 'POST',
+            url: '/admin/t/'+tempid+'/layer/toattr',
+            data: data,
+            dataType: 'json',
+            success: function(data) {
+                if (data.code!=0) {
+                    alert(data.msg);return;
+                }
+//                alert(data);return;
+                window.location.href = '';
+            }
+        });
+    }
+    //ajax更新文字内容数据
+    function setText(){
+        var iscon = $("input[name='iscon']").val();
+        var text = $("textarea[name='text']").val();
+        var data = {
+            'tempid':tempid,
+            'layerid':layerid,
+            'iscon':iscon,
+            'text':text
+        };
+        $.ajax({
+            type: 'POST',
+            url: '/admin/t/'+tempid+'/layer/totext',
+            data: data,
+            dataType: 'json',
+            success: function(data) {
+                if (data.code!=0) {
+                    alert(data.msg);return;
+                }
+                window.location.href = '';
+            }
+        });
+    }
+    //取消、删除几个缓存
+    function cancel(){
+        window.location.href = '{{DOMAIN}}admin/t/'+tempid+'/layer/cancel/'+layerid;
+    }
+    //缓存入库
+    function save(){
+        window.location.href = '{{DOMAIN}}admin/t/'+tempid+'/layer/save/'+layerid;
+    }
+</script>

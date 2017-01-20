@@ -11,23 +11,25 @@ class BaseController extends Controller
      * 系统后台基础控制器
      */
 
+    protected $curr;
+
     public function __construct()
     {
         parent::__construct();
-        $this->setSessionInRedis();     //同步缓存中session
+        $this->setSessionInRedis($this->redisTime);     //同步缓存中session
         if (!Session::has('admin')) { return redirect(DOMAIN.'admin/login'); }
     }
 
     /**
      * 判断session、缓存
      */
-    public function setSessionInRedis()
+    public function setSessionInRedis($redisTime)
     {
         //假如session中有，缓存中没有，则同步为有
         if (Session::get('admin') && !Redis::get('cul_admin_session')) {
             $adminInfo = Session::get('admin');
             $adminInfo['cookie'] = $_COOKIE;
-            Redis::setex('cul_admin_session',$this->redisTime,serialize($adminInfo));
+            Redis::setex('cul_admin_session',$redisTime,serialize($adminInfo));
         }
         //假如session中没有，缓存中有，则同步为有
         if (!Session::get('admin') && Redis::get('cul_admin_session')) {
@@ -42,7 +44,7 @@ class BaseController extends Controller
         if (Session::get('admin')) {
             $cul_admin_session = Session::get('admin');
             $cul_admin_session['cookie'] = $_COOKIE;
-            Redis::setex('cul_admin_session',$this->redisTime,serialize($cul_admin_session));
+            Redis::setex('cul_admin_session',$redisTime,serialize($cul_admin_session));
             Session::put('admin',$cul_admin_session);
         }
     }

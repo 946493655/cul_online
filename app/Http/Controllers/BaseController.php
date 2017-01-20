@@ -15,19 +15,19 @@ class BaseController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->setSessionInRedis();     //同步缓存中session
+        $this->setSessionInRedis($this->redisTime);     //同步缓存中session
     }
 
     /**
      * 判断session、缓存
      */
-    public function setSessionInRedis()
+    public function setSessionInRedis($redisTime)
     {
         //假如session中有，缓存中没有，则同步为有
         if (Session::get('user') && !Redis::get('cul_session')) {
             $userInfo = Session::get('user');
             $userInfo['cookie'] = $_COOKIE;
-            Redis::setex('cul_session',$this->redisTime,serialize($userInfo));
+            Redis::setex('cul_session',$redisTime,serialize($userInfo));
         }
         //假如session中没有，缓存中有，则同步为有
         if (!Session::get('user') && Redis::get('cul_session')) {
@@ -42,7 +42,7 @@ class BaseController extends Controller
         if (Session::get('user')) {
             $cul_session = Session::get('user');
             $cul_session['cookie'] = $_COOKIE;
-            Redis::setex('cul_session',$this->redisTime,serialize($cul_session));
+            Redis::setex('cul_session',$redisTime,serialize($cul_session));
             Session::put('user',$cul_session);
         }
     }

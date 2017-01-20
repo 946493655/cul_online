@@ -58,7 +58,7 @@ Route::group(['prefix'=>'u','middleware' =>'MemberAuth','namespace'=>'Member'], 
 Route::group(['prefix'=>'admin','namespace'=>'Admin'], function(){
     Route::get('login', 'LoginController@index');
     Route::post('dologin', 'LoginController@dologin');
-    Route::post('logout', 'LoginController@logout');
+    Route::get('logout', 'LoginController@logout');
 });
 
 /**
@@ -66,9 +66,29 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'], function(){
  */
 Route::group(['prefix'=>'admin','middleware' =>'AdminAuth','namespace'=>'Admin'], function(){
     Route::get('/', 'TempProController@index');
+    Route::get('temp/clear', 'TempProController@clearTable');
     Route::post('temp/{id}', 'TempProController@update');
-    Route::post('temp/modifylink/{id}', 'TempProController@set2Link');
+    Route::post('temp/link/{id}', 'TempProController@set2Link');
     Route::post('temp/isshow/{id}/{isshow}', 'TempProController@setIsShow');
     Route::post('temp/delete/{id}', 'TempProController@forceDelete');
     Route::resource('temp', 'TempProController');
+    Route::get('temp/preview/{id}', 'TempProController@preview');
+    Route::group(['prefix'=>'t/{tempid}'], function(){
+        Route::get('layer/{layerid}', 'LayerController@show');
+        Route::post('layer/tolayer', 'LayerController@setLayer');
+        Route::post('layer/toattr', 'LayerController@setAttr');
+        Route::post('layer/totext', 'LayerController@settext');
+        Route::post('layer/toimg/{layerid}', 'LayerController@setImg');
+        Route::get('layer/cancel/{layerid}', 'LayerController@delRedis');
+        Route::get('layer/save/{layerid}', 'LayerController@saveRedisToDB');
+        Route::resource('layer', 'LayerController');
+    });
+    Route::group(['prefix'=>'t/{tempid}/{layerid}'], function(){
+        Route::post('frame/toattr', 'FrameController@selAttr');
+        Route::post('frame/setval', 'FrameController@setKeyVal');
+        Route::get('frame/cancel', 'FrameController@delRedis');
+        Route::get('frame/save', 'FrameController@saveRedisToDB');
+        Route::resource('frame', 'FrameController');
+        Route::get('prelayer', 'FrameController@getPreLayer');
+    });
 });
