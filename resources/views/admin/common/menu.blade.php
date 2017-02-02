@@ -6,7 +6,11 @@
         <a href="{{DOMAIN}}admin/order/torender" @if(isset($curr)&&$curr=='torender')style="color:orangered;"@endif><b>渲染列表</b></a>
         <a href="{{DOMAIN}}admin/order/finish" @if(isset($curr)&&$curr=='finish')style="color:orangered;"@endif><b>用户成品</b></a>
         <a href="{{DOMAIN}}admin/product" @if(isset($curr)&&$curr=='product')style="color:orangered;"@endif><b>用户创作</b></a>
-        <a href="{{DOMAIN}}admin/temp" @if(isset($curr)&&$curr=='temp')style="color:orangered;"@endif><b>模板列表</b>
+        <a href="{{DOMAIN}}admin/temp"
+           @if((isset($curr)&&$curr=='temp') || (explode('/',$_SERVER['REQUEST_URI'])['2']=='t'))
+                style="color:orangered;"
+                @endif
+        ><b>模板列表</b>
         </a>
     </div>
     @if(isset($model)&&isset($cate))

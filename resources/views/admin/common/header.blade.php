@@ -18,7 +18,7 @@
             <a href="{{env('DOMAIN')}}" target="_blank">网站前台</a>
             @endif
             <a href="{{env('TALK_DOMAIN')}}" target="_blank">话题论坛</a>
-            <a href="{{env('WWW_DOMAIN')}}/admin" target="_blank">主网站后台</a>
+            <a href="{{env('WWW_DOMAIN')}}" target="_blank">主网站</a>
         </div>
       </span>
     </div>

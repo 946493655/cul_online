@@ -15,6 +15,9 @@
     #keyframe .right { width:900px;position:absolute;top:20px;left:90px; }
     #keyframe .right .dui { margin:2px;float:left; }
     #keyframe .right .dui span { font-size:12px;color:grey; }
+    #keyframe .right .dui input[type="button"] {
+        color:grey;border:1px solid #2a2a2a;background:#2a2a2a;outline:none;cursor:pointer; }
+    #keyframe .right .dui input[type="button"]:hover { color:white;border:1px solid orangered;background:#333; }
     #keyframe .right input {
         width:25px;border:0;color:orangered;text-align:center;font-size:14px;background:#333;
     }
@@ -37,7 +40,7 @@
 <div id="keys">
     <div id="title">
         <b>动画调节：</b>
-        <span style="font-size:14px">(鼠标滚动，下面是一对一对 左边时间-右边值 的组合：时间=百分比x时长)</span>
+        <span style="font-size:14px">(鼠标滚动 | 下面是 [左边时间-右边值] 的组合：时间=百分比x时长)</span>
         <span style="float:right;" id="titlebtn">
             <a href="javascript:;" title="增加运动轨迹" style="color:orangered;" onclick="$('#addkey').show(200);">添加关键帧</a>
             @if($frameRedis)
@@ -50,15 +53,15 @@
     <div id="keyframe">
         <div class="left">
             <p>
-                <a href="javacript:;" title="点击修改平移动画" class="{{$attr==1?'curr':''}} aleft" id="left_1"
+                <a href="javascript:;" title="点击修改平移动画" class="{{$attr==1?'curr':''}} aleft" id="left_1"
                    onclick="selAttr(1)">水平距离</a>
             </p>
             <p>
-                <a href="javacript:;" title="点击修改垂直动画" class="{{$attr==2?'curr':''}} aleft" id="left_2"
+                <a href="javascript:;" title="点击修改垂直动画" class="{{$attr==2?'curr':''}} aleft" id="left_2"
                    onclick="selAttr(2)">垂直距离</a>
             </p>
             <p>
-                <a href="javacript:;" title="点击修改透明度动画" class="{{$attr==3?'curr':''}} aleft" id="left_3"
+                <a href="javascript:;" title="点击修改透明度动画" class="{{$attr==3?'curr':''}} aleft" id="left_3"
                    onclick="selAttr(3)">透明度</a>
             </p>
             <div style="height:20px;"></div>
@@ -67,11 +70,12 @@
             <div class="dui" id="dui_1" style="display:{{$attr==1?'block':'none'}};">
             @if($leftArr)
                 @foreach($leftArr as $left)
-                <input type="text" name="per_{{$left['id']}}" value="{{$left['per']}}"
+                <input type="text" name="per_{{$left['id']}}" value="{{$left['per']}}" title="修改该百分比"
                        onchange="setFrame({{$left['id']}})">
                 <span>%-</span>
-                <input type="text" name="val_{{$left['id']}}" value="{{$left['val']}}"
+                <input type="text" name="val_{{$left['id']}}" value="{{$left['val']}}" title="修改该值"
                        onchange="setFrame({{$left['id']}})">
+                <input type="button" class="close" title="点击删除该关键帧" value="X" onclick="delFrame({{$left['id']}})">
                 <span>，</span> &nbsp;
                 @endforeach
             @else <span style="font-size:16px">没有水平距离关键帧</span>
@@ -80,10 +84,10 @@
             <div class="dui" id="dui_2" style="display:{{$attr==2?'block':'none'}};">
             @if($topArr)
                 @foreach($topArr as $top)
-                <input type="text" name="per_{{$top['id']}}" value="{{$top['per']}}"
+                <input type="text" name="per_{{$top['id']}}" value="{{$top['per']}}" title="修改该百分比"
                        onchange="setFrame({{$top['id']}})">
                 <span>%-</span>
-                <input type="text" name="val_{{$top['id']}}" value="{{$top['val']}}"
+                <input type="text" name="val_{{$top['id']}}" value="{{$top['val']}}" title="修改该值"
                        onchange="setFrame({{$top['id']}})">
                 <span>，</span> &nbsp;
                 @endforeach
@@ -93,10 +97,10 @@
             <div class="dui" id="dui_3" style="display:{{$attr==3?'block':'none'}};">
             @if($opacityArr)
                 @foreach($opacityArr as $opacity)
-                <input type="text" name="per_{{$opacity['id']}}" value="{{$opacity['per']}}"
+                <input type="text" name="per_{{$opacity['id']}}" value="{{$opacity['per']}}" title="修改该百分比"
                        onchange="setFrame({{$opacity['id']}})">
                 <span>%-</span>
-                <input type="text" name="val_{{$opacity['id']}}" value="{{$opacity['val']}}"
+                <input type="text" name="val_{{$opacity['id']}}" value="{{$opacity['val']}}" title="修改该值"
                        onchange="setFrame({{$opacity['id']}})">
                 <span>，</span> &nbsp;
                 @endforeach
@@ -125,7 +129,7 @@
             </select>
             &nbsp;&nbsp;&nbsp;&nbsp;
             时间百分比：
-            <input type="text" pattern="^\d{0,2}$" name="per"> %
+            <input type="text" pattern="^\d{0,3}$" maxlength="100" name="per"> %
             &nbsp;&nbsp;&nbsp;&nbsp;
             值：
             <input type="text" name="val">
@@ -194,5 +198,21 @@
     }
     function save(){
         window.location.href = '{{DOMAIN}}admin/t/'+tempid+'/'+layerid+'/frame/save';
+    }
+    function delFrame(frameid){
+        var attr = $("input[name='attr']").val();
+        $.ajax({
+            type: 'POST',
+            url: '/admin/t/'+tempid+'/'+layerid+'/frame/delete',
+            data: {'id':frameid,'layerid':layerid,'attr':attr},
+            dataType: 'json',
+            success: function(data) {
+                if (data.code!=0) {
+                    alert(data.msg);return;
+                } else {
+                    window.location.href = '';
+                }
+            }
+        });
     }
 </script>

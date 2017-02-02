@@ -180,7 +180,7 @@ class TempProController extends BaseController
     /**
      * 模板动画预览
      */
-    public function preview($id)
+    public function getPreview($id)
     {
         $apiKey = ApiTempFrame::getFramesByTempid($id);
         if ($apiKey['code']!=0) {
@@ -192,8 +192,16 @@ class TempProController extends BaseController
         }
         $result = [
             'layers' => $rst['data'],
+            'tempid' => $id,
         ];
-        return view('admin.temp.preview',$result);
+        return view('admin.layer.onetemp', $result);
+    }
+
+    /**
+     * 模板的框架载入
+     */
+    public function getPreTemp($id)
+    {
     }
 
 

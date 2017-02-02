@@ -8,14 +8,12 @@
         @include('admin.common.menu')
         <table class="list">
             <tr><td colspan="5">
-                    <a href="javascript:;" style="color:lightgrey;" onclick="history.go(-1);">返回上一页</a>
+                    <a href="javascript:;" style="color:lightgrey;"
+                       onclick="window.location.href='{{DOMAIN}}admin/t/{{$tempid}}/layer';">返回上一页</a>
                 </td></tr>
-            <tr>
-                <td>模板名称：{{$layerModel['tempName']}}</td>
-                <td>当前动画层：{{$layerModel['name']}}</td>
-            </tr>
+            <tr><td>模板名称：</td></tr>
             <tr><td colspan="5" style="border:0;">
-                    <iframe id="preview" frameborder=0 scrolling=no src="{{DOMAIN}}admin/t/{{$tempid}}/{{$layerid}}/keyvals"></iframe>
+                    <iframe id="preview" frameborder=0 scrolling=no src="{{DOMAIN}}admin/temp/preview/layers/{{$tempid}}"></iframe>
                 </td>
             </tr>
         </table>

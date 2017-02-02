@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Request as AjaxRequest;
 use Illuminate\Support\Facades\Input;
 use Redis;
 
-class LayerController extends BaseController
+class TLayerController extends BaseController
 {
     /**
      * 动画修改
@@ -17,7 +17,7 @@ class LayerController extends BaseController
 
     protected $rediskey = 'online_admin_layer_';
 
-    public function index($tempid)
+    public function index($tempid,$layerid=0)
     {
         $rstTemp = ApiTempPro::show($tempid);
         if ($rstTemp['code']!=0) {
@@ -27,9 +27,17 @@ class LayerController extends BaseController
         if ($rst['code']!=0) {
             echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
         }
+        //当前操作的动画层
+        $layerid = $layerid ? $layerid : $rst['data'][0]['id'];
+        $rstLayer = ApiTempLayer::show($layerid);
+        if ($rstLayer['code']!=0) {
+            echo "<script>alert('".$rstLayer['msg']."');history.go(-1);</script>";exit;
+        }
         $result = [
             'temp' => $rstTemp['data'],
             'datas' => $rst['data'],
+            'layerid' => $layerid,
+            'layerName' => $rstLayer['data']['name'],
         ];
         return view('admin.layer.index',$result);
     }
@@ -75,6 +83,7 @@ class LayerController extends BaseController
             $attrs = isset($layerArr['attr'])?$layerArr['attr']:[];
             $cons = isset($layerArr['con'])?$layerArr['con']:[];
             $menutab = isset($layerArr['menu']['menutab'])?$layerArr['menu']['menutab']:1;
+            $hasRedis = ($layers||$attrs||$cons) ? 1 : 0;      //判断是否有缓存
         }
         //动画、属性、内容，没有的话去接口获取
         $apilayer = $rstLayer['data'];
@@ -105,6 +114,7 @@ class LayerController extends BaseController
             'attrs' => isset($attrs) ? $attrs : [],
             'cons' => isset($cons) ? $cons : [],
             'menutab' => isset($menutab) ? $menutab : 1,
+            'hasRedis' => (isset($hasRedis)&&$hasRedis) ? 1 : 0,
         ];
         return view('admin.layer.iframe',$result);
     }
@@ -142,13 +152,12 @@ class LayerController extends BaseController
     public function setAttr()
     {
         if (AjaxRequest::ajax()) {
-//            dd(Input::all());
             //验证宽高
             if (Input::get('width')!='' && floor(Input::get('width'))!=Input::get('width')) {
                 echo json_encode(array('code'=>-1, 'msg'=>'宽度只能是正整数！'));exit;
             }
-            if (Input::get('height')!='' && !is_int(Input::get('height'))) {
-                echo json_encode(array('code'=>-1, 'msg'=>'高度度只能是正整数！'));exit;
+            if (Input::get('height')!='' && floor(Input::get('height'))!=Input::get('height')) {
+                echo json_encode(array('code'=>-1, 'msg'=>'高度只能是正整数！'));exit;
             }
             //验证边框
             if (Input::get('isborder') && (!Input::get('border1')||!Input::get('border2')||!Input::get('border3'))) {
@@ -177,6 +186,8 @@ class LayerController extends BaseController
                 'iscolor'   =>  Input::get('iscolor'),
                 'color'     =>  Input::get('color'),
                 'fontsize'  =>  Input::get('fontsize'),
+                'isbigbg'      =>  Input::get('isbigbg'),
+                'bigbg'        =>  Input::get('bigbg'),
             ];
             Redis::setex($rediskey,$this->redisTime,serialize($data));
             echo json_encode(array('code'=>0, 'msg'=>'操作成功！'));exit;
@@ -333,6 +344,8 @@ class LayerController extends BaseController
             'iscon'     =>  isset($layerArr['con']['iscon'])?$layerArr['con']['iscon']:'',
             'text'      =>  isset($layerArr['con']['text'])?$layerArr['con']['text']:'',
             'img'       =>  isset($layerArr['con']['img'])?$layerArr['con']['img']:'',
+            'isbigbg'      =>  isset($layerArr['attr']['isbigbg'])?$layerArr['attr']['isbigbg']:'',
+            'bigbg'        =>  isset($layerArr['attr']['bigbg'])?$layerArr['attr']['bigbg']:'',
         ];
         $rstLayer2 = ApiTempLayer::modify($data);
         if ($rstLayer2['code']!=0) {

@@ -9,7 +9,7 @@
 
     /*右侧菜单面板*/
     #menu { margin-top:5px;padding:5px;padding-bottom:20px;width:190px;height:450px;color:grey;background:black;overflow:scroll;position:relative;top:-460px;left:800px; }
-    #menu #title { width:200px;color:#4d4d4d;position:fixed;top:0px;background:black; }
+    #menu #title { width:200px;color:#4d4d4d;position:fixed;top:0px;z-index:10;background:black; }
     #menu .menu { margin:0;padding:5px 0;padding-left:10px;border-bottom:1px dashed #212121; }
     #menu a { color:grey;text-decoration:none; }
     #menu a:hover { color:orangered; }
@@ -23,9 +23,19 @@
     #menu input[type="submit"]:hover { border:1px solid #660000; }
     #submit { margin-left:5px;margin-top:10px; }
     #submit .submit { padding:5px 10px;width:75px;font-size:14px;color:lightgrey;background:#333;cursor:pointer; }
+
     /*动画窗口*/
-    #iframe { width:800px;height:450px;background:grey;overflow:hidden; }
-    #iframe #attr_default { margin:100px auto;padding:5px;width:300px;height:100px;color:grey;background:white;overflow:hidden; }
+    #iframe {
+        width:800px; height:450px;
+        background:{{(isset($attrs['isbigbg'])&&$attrs['isbigbg'])?$attrs['bigbg']:'#6a6a6a'}};
+        overflow:hidden;
+    }
+    #iframe #attr_default {
+        margin:100px auto; padding:5px;
+        width:300px; height:100px;
+        color:grey; background:white;
+        overflow:hidden;
+    }
     #iframe #attr {
         margin:100px auto;padding:5px;
         overflow:hidden;
@@ -64,7 +74,7 @@
     <div style="height:35px;"></div>
     <div class="menu"><a href="javascript:;" title="点击切换" onclick="getMenu(1)">动画设置：</a>
         <div class="menutab" id="menu1" style="display:{{((isset($menutab)&&$menutab==1)||!isset($menutab))?'block':'none'}};">
-            名称：<input type="text" minlength="2" maxlength="20" required style="width:80px" name="name" value="{{$layers['name']}}" onchange="setLayer()">
+            名称：<input type="text" minlength="2" maxlength="20" required style="width:90px" name="name" value="{{$layers['name']}}" onchange="setLayer()">
             <br>
             起始时间：<input type="text" pattern="^\d+$" required name="delay" value="{{$layers['delay']}}" onchange="setLayer()"> s
             <br>
@@ -73,6 +83,16 @@
     </div>
     <div class="menu"><a href="javascript:;" title="点击切换" onclick="getMenu(2)">样式属性：</a>
         <div class="menutab" id="menu2" style="display:{{(isset($menutab)&&$menutab==2)?'block':'none'}};">
+            <p>大背景：<label><input type="radio" class="radio" name="isbigbg0" value="0" @if(isset($attrs['isbigbg'])){{!$attrs['isbigbg']?'checked':''}}@endif onclick="isbigbg(0)" onchange="setAttr()">无 </label>
+                <label><input type="radio" class="radio" name="isbigbg1" value="1" @if(isset($attrs['isbigbg'])){{$attrs['isbigbg']?'checked':''}}@else{{'checked'}}@endif onclick="isbigbg(1)" onchange="setAttr()">有 </label></p>
+            <div id="isbigbg" style="display:{{((isset($attrs['isbigbg'])&&$attrs['isbigbg'])||!isset($attrs['isbigbg']))?'block':'none'}};">
+                <input type="hidden" name="isbigbg" value="{{(isset($attrs['isbigbg'])&&$attrs['isbigbg'])?$attrs['isbigbg']:1}}">
+                <p style="position:relative;top:-6px;">&nbsp;&nbsp;
+                    选颜色：<input type="color" title="点击选择颜色" value="{{(isset($attrs['bigbg'])&&$attrs['bigbg'])?$attrs['bigbg']:'#6a6a6a'}}" onchange="setBigBgColor(this.value)">
+                    <input type="hidden" name="bigbg" value="{{(isset($attrs['bigbg'])&&$attrs['bigbg'])?$attrs['bigbg']:'#6a6a6a'}}">
+                </p>
+            </div>
+
             <p>宽度：<input type="text" name="width" style="width:50px;" value="{{(isset($attrs['width'])&&$attrs['width'])?$attrs['width']:'300'}}" onchange="setAttr()"> px</p>
 
             <p>高度：<input type="text" name="height" style="width:50px;" value="{{(isset($attrs['height'])&&$attrs['height'])?$attrs['height']:'100'}}" onchange="setAttr()"> px</p>
@@ -89,9 +109,6 @@
                         @endforeach
                     </select>
                 </p>
-                {{--<p>&nbsp;&nbsp;--}}
-                    {{--原颜色：@if(isset($attrs['isborder'])&&$attrs['isborder']&&isset($attrs['border3'])&&$attrs['border3'])<a href="javascript:;" style="padding:0 15px;border:2px solid #333;font-size:12px;background:{{$attrs['border3']}};"></a>@else 默认 @endif--}}
-                {{--</p>--}}
                 <p style="position:relative;top:-6px;">&nbsp;&nbsp;
                     选颜色：<input type="color" title="点击选择颜色" value="{{(isset($attrs['border3'])&&$attrs['border3'])?$attrs['border3']:'#ff0000'}}" onchange="setBoderColor(this.value)">
                     <input type="hidden" name="border3" value="{{(isset($attrs['border3'])&&$attrs['border3'])?$attrs['border3']:'#ff0000'}}">
@@ -102,9 +119,6 @@
             <label><input type="radio" class="radio" name="isbg1" value="1" @if(isset($attrs['isbg'])){{$attrs['isbg']?'checked':''}}@else{{'checked'}}@endif onclick="isbg(1)" onchange="setAttr()">有 </label></p>
             <div id="isbg" style="display:{{((isset($attrs['isbg'])&&$attrs['isbg'])||!isset($attrs['isbg']))?'block':'none'}};">
                 <input type="hidden" name="isbg" value="{{(isset($attrs['isbg'])&&$attrs['isbg'])?$attrs['isbg']:1}}">
-                {{--<p>&nbsp;&nbsp;--}}
-                    {{--原颜色：@if(isset($attrs['isbg'])&&$attrs['isbg']&&isset($attrs['bg'])&&$attrs['bg'])<a href="javascript:;" style="padding:0 15px;border:2px solid #333;font-size:12px;background:{{$attrs['bg']}};">&nbsp;</a>@else 默认 @endif--}}
-                {{--</p>--}}
                 <p style="position:relative;top:-6px;">&nbsp;&nbsp;
                     选颜色：<input type="color" title="点击选择颜色" value="{{(isset($attrs['bg'])&&$attrs['bg'])?$attrs['bg']:'#ffffff'}}" onchange="setBgColor(this.value)">
                     <input type="hidden" name="bg" value="{{(isset($attrs['bg'])&&$attrs['bg'])?$attrs['bg']:'#ffffff'}}">
@@ -153,10 +167,12 @@
             </form>
         </div>
     </div>
+    @if($hasRedis)
     <div id="submit">
         <a href="javascript:;" title="点击取消修改" class="submit" onclick="cancel()">取消修改</a>
         <a href="javascript:;" title="点击确定修改" class="submit" onclick="save()">确定修改</a>
     </div>
+    @endif
     <div style="height:50px;"></div>
 @else
     <div class="menu"><a href="javascript:;">待添加...</a></div>
@@ -200,8 +216,19 @@
             $("#isbg").show();
         }
     }
+    function isbigbg(tab){
+        $("input[name='isbigbg']")[0].value = tab;
+        if (tab==0) {
+            $("#isbigbg").hide();
+        } else {
+            $("#isbigbg").show();
+        }
+    }
     function setBgColor(val){       //设置背景颜色
         $("input[name='bg']")[0].value = val; setAttr();
+    }
+    function setBigBgColor(val){       //设置大背景颜色
+        $("input[name='bigbg']")[0].value = val; setAttr();
     }
     function iscolor(tab){
         $("input[name='iscolor']")[0].value = tab;
@@ -267,13 +294,8 @@
         var iscolor = $("input[name='iscolor']").val();
         var color = $("input[name='color']").val();
         var fontsize = $("input[name='fontsize']").val();
-        //判断边框颜色、背景颜色、文字颜色
-        var border2_ok = $("input[name='border2_ok']").val();
-        var bg_ok = $("input[name='bg_ok']").val();
-        var color_ok = $("input[name='color_ok']").val();
-        if (isborder && border2_ok) { border2 = border2_ok; }
-        if (isbg && bg_ok) { bg = bg_ok; }
-        if (iscolor && color_ok) { color = color_ok; }
+        var isbigbg = $("input[name='isbigbg']").val();
+        var bigbg = $("input[name='bigbg']").val();
         var data = {
             'tempid':tempid,
             'layerid':layerid,
@@ -287,7 +309,9 @@
             'bg':bg,
             'iscolor':iscolor,
             'color':color,
-            'fontsize':fontsize
+            'fontsize':fontsize,
+            'isbigbg':isbigbg,
+            'bigbg':bigbg
         };
         $.ajax({
             type: 'POST',
@@ -298,7 +322,6 @@
                 if (data.code!=0) {
                     alert(data.msg);return;
                 }
-//                alert(data);return;
                 window.location.href = '';
             }
         });

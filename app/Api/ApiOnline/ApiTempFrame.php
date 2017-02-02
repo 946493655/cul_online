@@ -64,7 +64,8 @@ class ApiTempFrame
         }
         return array(
             'code' => 0,
-            'msg' => $response->error->msg,
+//            'msg' => $response->error->msg,
+            'data' => ApiBase::objToArr($response->data),
         );
     }
 
@@ -74,6 +75,27 @@ class ApiTempFrame
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, $data);
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+        );
+    }
+
+    /**
+     * 根据 frameid 销毁记录
+     */
+    public static function forceDelete($id)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/t/frame/delete';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'id'    =>  $id,
+        ));
         $response = json_decode($curl->response);
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Request as AjaxRequest;
 use Illuminate\Support\Facades\Input;
 use Redis;
 
-class FrameController extends BaseController
+class TFrameController extends BaseController
 {
     /**
      * 关键帧
@@ -75,14 +75,28 @@ class FrameController extends BaseController
         return view('admin.frame.index',$result);
     }
 
-    public function store(Request $request)
+    public function store(Request $request,$tempid,$layerid)
     {
         $data = $this->getData($request);
         $apiKey = ApiTempFrame::add($data);
         if ($apiKey['code']!=0) {
             echo "<script>alert('".$apiKey['msg']."');history.go(-1);</script>";exit;
         }
-        return redirect(DOMAIN.'admin/t/'.$data['tempid'].'/layer');
+        //假如这里有数据，并且有缓存，则新加的数据加入缓存
+        $rstFrame = ApiTempFrame::index($request->tempid,$request->layerid,$request->selattr);
+        $rstRedis = Redis::get($this->keyRedis.$request->layerid);
+        if ($rstRedis && $rstFrame['code']==0 && count($rstFrame['data'])>1) {
+            $layerArr = unserialize($rstRedis);
+            if ($request->selattr==1) {
+                $layerArr['frame_left'][$apiKey['data']['id']] = $apiKey['data'];
+            } elseif ($request->selattr==2) {
+                $layerArr['frame_top'][$apiKey['data']['id']] = $apiKey['data'];
+            } elseif ($request->selattr==2) {
+                $layerArr['frame_opacity'][$apiKey['data']['id']] = $apiKey['data'];
+            }
+            Redis::setex($this->keyRedis.$request->layerid,$this->redisTime,serialize($layerArr));
+        }
+        return redirect(DOMAIN.'admin/t/'.$data['tempid'].'/'.$data['layerid'].'/frame');
     }
 
     /**
@@ -217,14 +231,59 @@ class FrameController extends BaseController
     }
 
     /**
+     * ajax 删除关键帧
+     */
+    public function delete($tempid,$layerid)
+    {
+        if (AjaxRequest::ajax()) {
+            $data = Input::all();
+            if (!$data['id'] || !$data['attr']) {
+                echo json_encode(array('code'=>-2, 'msg'=>'参数有误！'));exit;
+            }
+            $rstFrame = ApiTempFrame::forceDelete($data['id']);
+            if ($rstFrame['code']!=0) {
+                echo json_encode(array('code'=>-3, 'msg'=>$rstFrame['msg']));exit;
+            }
+            //删除缓存中类似关键帧
+            $keyRedis = $this->keyRedis.$data['layerid'];
+            if ($rstRedis=Redis::get($keyRedis)) {
+                $layerArr = unserialize($rstRedis);
+                if (isset($layerArr['frame_left']) && $data['attr']==1 && array_key_exists($data['id'],$layerArr['frame_left'])) {
+                    unset($layerArr['frame_left'][$data['id']]);
+                } elseif (isset($layerArr['frame_top']) && $data['attr']==1 && array_key_exists($data['id'],$layerArr['frame_top'])) {
+                    unset($layerArr['frame_top'][$data['id']]);
+                } elseif (isset($layerArr['frame_opacity']) && $data['attr']==1 && array_key_exists($data['id'],$layerArr['frame_opacity'])) {
+                    unset($layerArr['frame_opacity'][$data['id']]);
+                }
+                Redis::setex($this->keyRedis.$data['layerid'],$this->redisTime,serialize($layerArr));
+            }
+            echo json_encode(array('code'=>0, 'msg'=>'操作成功！'));exit;
+        }
+        echo json_encode(array('code'=>-1, 'msg'=>'数据错误！'));exit;
+    }
+
+    /**
      * 预览一个动画层
      */
     public function getPreLayer($tempid,$layerid)
     {
-        $apiLayer = ApiTempFrame::index($tempid,$layerid,0);
-        if (!$tempid) {}
-        $result = [];
-        return view('admin.frame.onelayer');
+        if (!$tempid || !$layerid) {
+            echo "<script>alert('层参数有误！');history.go(-1);</script>";exit;
+        }
+        $apiLayer = ApiTempLayer::show($layerid);
+        if ($apiLayer['code']!=0) {
+            echo "<script>alert('".$apiLayer['msg']."');history.go(-1);</script>";exit;
+        }
+        $apiFrame = ApiTempFrame::index($tempid,$layerid,0);
+        if ($apiFrame['code']!=0) {
+            echo "<script>alert('没有动画关键帧！');history.go(-1);</script>";exit;
+        }
+        $result = [
+            'layerModel' => $apiLayer['data'],
+            'tempid' => $tempid,
+            'layerid' => $layerid,
+        ];
+        return view('admin.frame.onelayer', $result);
     }
 
     /**
@@ -232,7 +291,31 @@ class FrameController extends BaseController
      */
     public function getKeyVals($tempid,$layerid)
     {
-        $result = [];
+        $apiLayer = ApiTempLayer::show($layerid);
+        if ($apiLayer['code']!=0) {
+            echo "<script>alert('".$apiLayer['msg']."');history.go(-1);</script>";exit;
+        }
+        if ($apiLayer['data']['attr']) {
+            $attrs = unserialize($apiLayer['data']['attr']);
+        }
+        if ($apiLayer['data']['con']) {
+            $cons = unserialize($apiLayer['data']['con']);
+        }
+        $apiFrameLeft = ApiTempFrame::index($tempid,$layerid,1);
+//        if ($apiFrameLeft['code']!=0) {
+//            echo "<script>alert('".$apiFrameLeft['msg']."');history.go(-1);</script>";exit;
+//        }
+        $apiFrameTop = ApiTempFrame::index($tempid,$layerid,2);
+        $apiFrameOpacity = ApiTempFrame::index($tempid,$layerid,2);
+        $result = [
+            'layer' => $apiLayer['data'],
+            'layerModel' => $this->getLayerModel(),
+            'attrs' => isset($attrs) ? $attrs : [],
+            'cons' => isset($cons) ? $cons : [],
+            'frameLeft' => $apiFrameLeft['code']==0 ? $apiFrameLeft['data'] : [],
+            'frameTop' => $apiFrameTop['code']==0 ? $apiFrameTop['data'] : [],
+            'frameOpacity' => $apiFrameOpacity['code']==0 ? $apiFrameOpacity['data'] : [],
+        ];
         return view('admin.frame.keyval',$result);
     }
 
@@ -249,5 +332,14 @@ class FrameController extends BaseController
             'per'       =>  $request->per,
             'val'       =>  $request->val,
         );
+    }
+
+    /**
+     * 获取 layerModel
+     */
+    public function getLayerModel()
+    {
+        $rst = ApiTempLayer::getModel();
+        return $rst['code']==0 ? $rst['model'] : [];
     }
 }
