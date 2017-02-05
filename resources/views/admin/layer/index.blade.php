@@ -13,11 +13,13 @@
                 <td>产品类型：{{$temp['cateName']}}</td>
             </tr>
             <tr><td colspan="5" style="border:0;">
-                    <iframe id="modifytemp" width="980" height="450" frameborder=0 scrolling=no src="{{DOMAIN}}admin/t/{{$temp['id']}}/layer/{{$layerid}}"></iframe>
+                    <iframe id="modifytemp" width="985" height="450" frameborder=0 scrolling=no src="{{DOMAIN}}admin/t/{{$temp['id']}}/layer/{{$layerid}}"></iframe>
                     <iframe id="modifylayer" width="984" height="100" frameborder=0 scrolling=no src="{{DOMAIN}}admin/t/{{$temp['id']}}/{{$layerid}}/frame"></iframe>
                     <div id="buttonmenu" style="top:715px;">
                         <p>
                             <span style="color:#4d4d4d;"><b>层面板：</b></span>
+                            <a href="javascript:;" id="editbg" title="修改模板大背景"
+                                onclick="getEditBg()">模板背景</a>
                             <a href="javascript:;" id="addlayer" title="添加新的动画设置"
                                 onclick="getEditPro1()">添加动画</a>
                             <span style="float:right;">
@@ -71,9 +73,51 @@
             <p style="text-align:center">
                 <input type="submit" id="submit" title="点击确定更新" value="确定修改">
             </p>
-            <a href="javascript:void(0);" title="关闭" class="close" onclick="closeEditPro1()"> X </a>
+            <a href="javascript:void(0);" title="关闭" class="close" onclick="closeEditPro()"> X </a>
         </form>
     </div>
+    {{--弹出框：修改模板总背景--}}
+    <div class="editproduct" id="editproduct2">
+        <div class="mask"></div>
+        <form action="{{DOMAIN}}admin/temp/bg/{{$temp['id']}}" method="POST" data-am-validator enctype="multipart/form-data">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="_method" value="POST">
+            <input type="hidden" name="tempid" value="{{$temp['id']}}">
+            <p style="text-align:center"><b>{{$temp['name']}} 修改背景</b></p>
+            <p>类型选择：
+                <select name="isbg" onchange="setBg(this.value)">
+                    <option value="0" {{(!$tempAttrArr||$tempAttrArr['isbg']==0) ? 'selected ': ''}}>默认背景色</option>
+                    <option value="1" {{($tempAttrArr&&$tempAttrArr['isbg']==1) ? 'selected ': ''}}>颜色更新</option>
+                    <option value="2" {{($tempAttrArr&&$tempAttrArr['isbg']==2) ? 'selected ': ''}}>图片更新</option>
+                </select>
+            </p>
+            <p id="selcolor" style="display:{{($tempAttrArr&&$tempAttrArr['isbg']==1) ? 'block' : 'none'}};">
+                选择颜色：
+                <input type="color" name="bgcolor" title="点击选择颜色" style="padding:0;height:40px;cursor:pointer;"
+                       value="{{($tempAttrArr&&$tempAttrArr['bgcolor']) ? $tempAttrArr['bgcolor'] : '#9a9a9a'}}">
+            </p>
+            <p id="selimg" style="display:{{($tempAttrArr&&$tempAttrArr['isbg']==2) ? 'block' : 'none'}};">
+                @if($tempAttrArr&&$tempAttrArr['bgimg'])
+                    <img src="{{$tempAttrArr['bgimg']}}" width="300" height="150px"><br>
+                    重新
+                @endif
+                选择图片：<br>
+                <script src="{{PUB}}assets/js/local_pre.js"></script>
+                <input type="button" class="submit" value="[ 找图 ]" onclick="path.click()"
+                       style="width:90px;color:orangered;cursor:pointer;">
+                <input type="file" id="path" style="display:none" name="url_ori"
+                       onchange="url_file.value=this.value;loadImageFile();">
+                <input type="text" placeholder="本地图片地址" name="url_file" readonly style="width:300px;">
+                <div id="preview" style="width:300px;height:150px;border:1px dotted grey;
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale);display:none;"></div>
+            </p>
+            <p style="text-align:center">
+                <input type="submit" id="submit" title="点击确定更新" value="确定修改">
+            </p>
+            <a href="javascript:void(0);" title="关闭" class="close" onclick="closeEditPro()"> X </a>
+        </form>
+    </div>
+
     <script>
         function getLayer(layerid){
             var layerId0 = $("input[name='layerId0']").val();
@@ -82,26 +126,19 @@
             } else {
                 window.location.href = '{{DOMAIN}}admin/t/{{$temp['id']}}/'+layerid+'/layer';
             }
-            /*$(".atab").removeClass("curr");
-            $("#atab_"+layerid).addClass("curr");
-            $("#modifytemp")[0].src = "{{DOMAIN}}admin/t/{{$temp['id']}}/layer/"+layerid;
-            $("#modifylayer")[0].src = "{{DOMAIN}}admin/t/{{$temp['id']}}/"+layerid+"/frame";
-            //更新当前动画名称
-            var layerNameCurr = $("input[name='layerName_"+layerid+"']").val();
-            $("input[name='layerName']")[0].value = layerNameCurr;
-            var layerName = $("input[name='layerName']").val();
-            var preCurrLayer = $("#preCurrLayer");
-            var layerNameLimit;     //限制字数
-            if (layerName.length>4) {
-                layerNameLimit = layerName.substring(0,4)+'...';
-            } else {
-                layerNameLimit = layerName;
-            }
-            preCurrLayer[0].innerText = "预览["+layerNameLimit+"]";
-            preCurrLayer[0].title = '预览当前动画片段[ '+layerName+' ]';
-            preCurrLayer[0].href = '{{DOMAIN}}admin/t/{{$temp['id']}}/'+layerid+'/prelayer';*/
         }
         function getEditPro1(){ $("#editproduct1").show(); }
-        function closeEditPro1(){ $("#editproduct1").hide(); }
+        function closeEditPro(){ $('.editproduct').hide(); }
+        function getEditBg(){ $("#editproduct2").show(); }
+        function setBg(val){
+            if (val==1) {
+                $("#selcolor").show(); $("#selimg").hide(); $("#preview").hide();
+            } else if (val==2) {
+                $("#selimg").show(); $("#preview").show(); $("#selcolor").hide();
+            } else if (val==0) {
+                $("#selcolor").hide(); $("#preview").hide(); $("#selimg").hide();
+            }
+
+        }
     </script>
 @stop

@@ -126,42 +126,6 @@ class Controller extends BaseController
     }
 
     /**
-     * 图片、视频链接
-     * 图片上传，返回图片地址的数组
-     */
-    public function uploadImg($request,$imgName='url_ori',$oldImg)
-    {
-        //判断视频链接
-        $linkType = $request->linkType;
-        $link = $request->link;
-        if ($linkType==1 && (mb_substr($link,0,4)!='http'||mb_substr($link,mb_strlen($link)-4,4)!='.swf')) {
-            echo "<script>alert('Flash代码格式有误！');history.go(-1);</script>";exit;
-        } elseif ($linkType==2 && mb_substr($link,0,6)!='<embed') {
-            echo "<script>alert('html代码格式有误！');history.go(-1);</script>";exit;
-        } elseif ($linkType==3 && mb_substr($link,0,7)!='<iframe') {
-            echo "<script>alert('html代码格式有误！');history.go(-1);</script>";exit;
-        }
-        //判断图片存在
-        if($request->hasFile($imgName)){
-            if ($oldImg) { unlink($oldImg); }       //去除老图片
-            foreach ($_FILES as $img) {
-                if ($img['size'] > $this->uploadSizeLimit) {
-                    echo "<script>alert('上传的图片不能大于1M，请重新选择！');history.go(-1);</script>";exit;
-                }
-            }
-            $file = $request->file($imgName);           //获取图片
-            $prefix_url = rtrim(env('DOMAIN'),'/');     //图片访问前缀
-            return array(
-                'thumb' =>  $prefix_url.$this->upload($file,$this->suffix_img),
-                'linkType'  =>  $linkType,
-                'link'  =>  $link,
-            );
-        } else {
-            return array();
-        }
-    }
-
-    /**
      * 只上传图片，返回图片地址
      */
     public function uploadOnlyImg($request,$imgName='url_ori',$oldImgArr=[])

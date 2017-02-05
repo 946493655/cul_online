@@ -1,6 +1,6 @@
 @extends('admin.main')
 @section('content')
-    <div class="online_list">
+    <div class="online_list" style="height:1350px;">
         @include('admin.common.menu')
 
         <div class="searchlist">
@@ -41,8 +41,7 @@
             </a>
             @endfor
 
-            <div style="clear:both;"></div>
-            <div style="margin-top:20px;">@include('layout.page')</div>
+            <div style="clear:both;">@include('layout.page')</div>
         </div>
     </div>
     {{--弹出框：添加产品--}}

@@ -2,7 +2,7 @@
 @section('content')
     <div class="online_list">
         <div style="margin-bottom:20px;text-align:center;color:dimgray;" id="promptInfo">
-            <b>在这里，您就是下一位导演...</b>
+            <b style="font-size:20px;">在这里，您就是生活的导演...</b>
             <script>
                 //信息10秒后隐藏
                 setInterval('promptInfo()',1000*5);

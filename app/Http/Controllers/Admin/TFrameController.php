@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Api\ApiOnline\ApiTempFrame;
 use App\Api\ApiOnline\ApiTempLayer;
+use App\Api\ApiOnline\ApiTempPro;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Request as AjaxRequest;
 use Illuminate\Support\Facades\Input;
@@ -34,30 +35,41 @@ class TFrameController extends BaseController
             if ($attr==1 && isset($layerArr['frame_left'])) { $leftArr = $layerArr['frame_left']; }
             if ($attr==2 && isset($layerArr['frame_top'])) { $topArr = $layerArr['frame_top']; }
             if ($attr==3 && isset($layerArr['frame_opacity'])) { $opacityArr = $layerArr['frame_opacity']; }
+            if ($attr==4 && isset($layerArr['frame_rotate'])) { $rotateArr = $layerArr['frame_rotate']; }
+            if ($attr==5 && isset($layerArr['frame_scale'])) { $scaleArr = $layerArr['frame_scale']; }
             if (isset($layerArr['menu']['hasframe']) && $layerArr['menu']['hasframe']) {
                 $frameRedis = 1;
             }
         }
         //没有，再查询数据表
-        if ($attr==1 && !isset($leftArr)) {
-            $apiFrameLefts = ApiTempFrame::index($tempid,$layerid,$attr);
+        if (!isset($leftArr)) {
+            $apiFrameLefts = ApiTempFrame::index($tempid,$layerid,1);
             $leftArr = $apiFrameLefts['code']==0 ? $apiFrameLefts['data'] : [];
             $layerArr['frame_left'] = $leftArr;
         }
-        if ($attr==2 && !isset($topArr)) {
-            $apiFrameTops = ApiTempFrame::index($tempid,$layerid,$attr);
+        if (!isset($topArr)) {
+            $apiFrameTops = ApiTempFrame::index($tempid,$layerid,2);
             $topArr = $apiFrameTops['code']==0 ? $apiFrameTops['data'] : [];
             $layerArr['frame_top'] = $topArr;
         }
-        if ($attr==3 && !isset($opacityArr)) {
-            $apiFrameOpacitys = ApiTempFrame::index($tempid,$layerid,$attr);
+        if (!isset($opacityArr)) {
+            $apiFrameOpacitys = ApiTempFrame::index($tempid,$layerid,3);
             $opacityArr = $apiFrameOpacitys['code']==0 ? $apiFrameOpacitys['data'] : [];
             $layerArr['frame_opacity'] = $opacityArr;
+        }
+        if (!isset($rotateArr)) {
+            $apiFrameRotates = ApiTempFrame::index($tempid,$layerid,4);
+            $rotateArr = $apiFrameRotates['code']==0 ? $apiFrameRotates['data'] : [];
+            $layerArr['frame_rotate'] = $rotateArr;
+        }
+        if (!isset($scaleArr)) {
+            $apiFrameScales = ApiTempFrame::index($tempid,$layerid,5);
+            $scaleArr = $apiFrameScales['code']==0 ? $apiFrameScales['data'] : [];
+            $layerArr['frame_rotate'] = $scaleArr;
         }
         //获取model
         $apiTempFrameModel = ApiTempFrame::getModel();
         //保存到缓存
-//        dd(unserialize(Redis::get($this->keyRedis.$layerid)));
         if (!$rstRedis) {
             $layerArr['menu']['hasframe'] = isset($frameRedis) ? 1 : 0;
             Redis::setex($this->keyRedis.$layerid,$this->redisTime,serialize($layerArr));
@@ -66,6 +78,8 @@ class TFrameController extends BaseController
             'leftArr' => isset($leftArr) ? $leftArr : [],
             'topArr' => isset($topArr) ? $topArr : [],
             'opacityArr' => isset($opacityArr) ? $opacityArr : [],
+            'rotateArr' => isset($rotateArr) ? $rotateArr : [],
+            'scaleArr' => isset($scaleArr) ? $scaleArr : [],
             'model' => $apiTempFrameModel['code']==0 ? $apiTempFrameModel['model'] : [],
             'tempid' => $tempid,
             'layerid' => $layerid,
@@ -91,8 +105,12 @@ class TFrameController extends BaseController
                 $layerArr['frame_left'][$apiKey['data']['id']] = $apiKey['data'];
             } elseif ($request->selattr==2) {
                 $layerArr['frame_top'][$apiKey['data']['id']] = $apiKey['data'];
-            } elseif ($request->selattr==2) {
+            } elseif ($request->selattr==3) {
                 $layerArr['frame_opacity'][$apiKey['data']['id']] = $apiKey['data'];
+            } elseif ($request->selattr==4) {
+                $layerArr['frame_rotate'][$apiKey['data']['id']] = $apiKey['data'];
+            } elseif ($request->selattr==5) {
+                $layerArr['frame_scale'][$apiKey['data']['id']] = $apiKey['data'];
             }
             Redis::setex($this->keyRedis.$request->layerid,$this->redisTime,serialize($layerArr));
         }
@@ -131,7 +149,7 @@ class TFrameController extends BaseController
             $attr = Input::get('attr');
             $per = Input::get('per');
             $val = Input::get('val');
-            if (!$layerid || !$frameid || !in_array($attr,[1,2,3])) {
+            if (!$layerid || !$frameid || !in_array($attr,[1,2,3,4,5])) {
                 echo json_encode(array('code'=>-2, 'msg'=>'参数错误！'));
             }
             if (floor($per)!=$per || $per<0 || $per>100) {
@@ -142,13 +160,20 @@ class TFrameController extends BaseController
             } elseif ($attr==3 && (floor($val)!=$val||$val<0||$val>100)) {
                 echo json_encode(array('code'=>-4, 'msg'=>'透明度必须是 0-100 的整数！'));
             }
+            if (in_array($attr,[4,5]) && floor($val)!=$val) {
+                echo json_encode(array('code'=>-3, 'msg'=>'旋转或缩放必须是整数！'));
+            }
             //假如有缓存，更新缓存
             if ($attr==1) {
                 $frame_key = 'frame_left';
             } elseif ($attr==2) {
                 $frame_key = 'frame_top';
-            } else {
+            } elseif ($attr==3) {
                 $frame_key = 'frame_opacity';
+            } elseif ($attr==4) {
+                $frame_key = 'frame_rotate';
+            } elseif ($attr==5) {
+                $frame_key = 'frame_scale';
             }
             $rstRedis = Redis::get($this->keyRedis.$layerid);
             if ($rstRedis) {
@@ -157,7 +182,6 @@ class TFrameController extends BaseController
             $layerArr[$frame_key][$frameid]['per'] = $per;
             $layerArr[$frame_key][$frameid]['val'] = $val;
             $layerArr['menu']['hasframe'] = 1;      //代表有修改但未保存
-//            dd(unserialize(Redis::get($this->keyRedis.$layerid)));
             Redis::setex($this->keyRedis.$layerid,$this->redisTime,serialize($layerArr));
             echo json_encode(array('code'=>0, 'msg'=>'操作成功！'));exit;
         }
@@ -222,6 +246,28 @@ class TFrameController extends BaseController
                     $datas['frameids'][] = $kopacity;
                 }
             }
+            if (isset($layerArr['frame_rotate']) && $frameRotate=$layerArr['frame_rotate']) {
+                foreach ($frameRotate as $krotate=>$rotate) {
+                    $rotateArr = [
+                        'id'    =>  $krotate,
+                        'per'   =>  $rotate['per'],
+                        'val'   =>  $rotate['val'],
+                    ];
+                    $datas['frames'][$krotate] = $rotateArr;
+                    $datas['frameids'][] = $krotate;
+                }
+            }
+            if (isset($layerArr['frame_scale']) && $frameScale=$layerArr['frame_scale']) {
+                foreach ($frameScale as $kscale=>$scale) {
+                    $scaleArr = [
+                        'id'    =>  $kscale,
+                        'per'   =>  $scale['per'],
+                        'val'   =>  $scale['val'],
+                    ];
+                    $datas['frames'][$kscale] = $scaleArr;
+                    $datas['frameids'][] = $kscale;
+                }
+            }
             $rstFrame = ApiTempFrame::modify($datas);
             if ($rstFrame['code']!=0) {
                 echo "<script>alert('".$rstFrame['msg']."');history.go(-1);</script>";exit;
@@ -254,6 +300,10 @@ class TFrameController extends BaseController
                     unset($layerArr['frame_top'][$data['id']]);
                 } elseif (isset($layerArr['frame_opacity']) && $data['attr']==1 && array_key_exists($data['id'],$layerArr['frame_opacity'])) {
                     unset($layerArr['frame_opacity'][$data['id']]);
+                } elseif (isset($layerArr['frame_rotate']) && $data['attr']==1 && array_key_exists($data['id'],$layerArr['frame_rotate'])) {
+                    unset($layerArr['frame_rotate'][$data['id']]);
+                } elseif (isset($layerArr['frame_scale']) && $data['attr']==1 && array_key_exists($data['id'],$layerArr['frame_scale'])) {
+                    unset($layerArr['frame_scale'][$data['id']]);
                 }
                 Redis::setex($this->keyRedis.$data['layerid'],$this->redisTime,serialize($layerArr));
             }
@@ -302,11 +352,10 @@ class TFrameController extends BaseController
             $cons = unserialize($apiLayer['data']['con']);
         }
         $apiFrameLeft = ApiTempFrame::index($tempid,$layerid,1);
-//        if ($apiFrameLeft['code']!=0) {
-//            echo "<script>alert('".$apiFrameLeft['msg']."');history.go(-1);</script>";exit;
-//        }
         $apiFrameTop = ApiTempFrame::index($tempid,$layerid,2);
-        $apiFrameOpacity = ApiTempFrame::index($tempid,$layerid,2);
+        $apiFrameOpacity = ApiTempFrame::index($tempid,$layerid,3);
+        $apiFrameRotate = ApiTempFrame::index($tempid,$layerid,4);
+        $apiFrameScale = ApiTempFrame::index($tempid,$layerid,5);
         $result = [
             'layer' => $apiLayer['data'],
             'layerModel' => $this->getLayerModel(),
@@ -315,6 +364,7 @@ class TFrameController extends BaseController
             'frameLeft' => $apiFrameLeft['code']==0 ? $apiFrameLeft['data'] : [],
             'frameTop' => $apiFrameTop['code']==0 ? $apiFrameTop['data'] : [],
             'frameOpacity' => $apiFrameOpacity['code']==0 ? $apiFrameOpacity['data'] : [],
+            'frameRotate' => $apiFrameScale['code']==0 ? $apiFrameScale['data'] : [],
         ];
         return view('admin.frame.keyval',$result);
     }

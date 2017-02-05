@@ -3,9 +3,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Api\ApiOnline\ApiProduct;
 use App\Api\ApiOnline\ApiTempFrame;
+use App\Api\ApiOnline\ApiTempLayer;
 use App\Api\ApiOnline\ApiTempPro;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
+use Redis;
+use Illuminate\Support\Facades\Request as AjaxRequest;
+use Illuminate\Support\Facades\Input;
 
 class TempProController extends BaseController
 {
@@ -69,16 +72,16 @@ class TempProController extends BaseController
     }
 
     /**
-     * 设置2链接：thumb、linkType、link
+     * 设置缩略图
      */
-    public function set2Link(Request $request,$id)
+    public function setThumb(Request $request,$id)
     {
         //图片验证
         if (!$request->url_file) {
             echo "<script>alert('没有上传图片！');history.go(-1);</script>";exit;
         }
         //去除老图片
-        $oldImg = '';
+        $oldImgArr = [];
         $rstTemp = ApiTempPro::show($id);
         if ($rstTemp['code']==0 && $rstTemp['data']['thumb']) {
             $thumbArr = explode('/',$rstTemp['data']['thumb']);
@@ -88,22 +91,47 @@ class TempProController extends BaseController
             } else {
                 $thumb = ltrim($rstTemp['data']['thumb'],'/');
             }
-            if (file_exists($thumb)) { $oldImg = $thumb; }
+            if (file_exists($thumb)) { $oldImgArr[] = $thumb; }
         }
         //链接类型验证
-        $linkArr = $this->uploadImg($request,'url_ori',$oldImg);
-        if (!$linkArr) {
-            echo "<script>alert('缩略图或视频链接有误！');history.go(-1);</script>";exit;
+        $thumb = $this->uploadOnlyImg($request,'url_ori',$oldImgArr);
+        if (!$thumb) {
+            echo "<script>alert('缩略图有误！');history.go(-1);</script>";exit;
         }
         $data = [
-            'thumb' =>  $linkArr['thumb'],
-            'linkType'  =>  $linkArr['linkType'],
-            'link'  =>  $linkArr['link'],
             'id'    =>  $id,
+            'thumb' =>  $thumb,
         ];
-        $rst = ApiTempPro::modify2Link($data);
-        if ($rst['code']!=0) {
-            echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
+        $apiTemp = ApiTempPro::setThumb($data);
+        if ($apiTemp['code']!=0) {
+            echo "<script>alert('".$apiTemp['msg']."');history.go(-1);</script>";exit;
+        }
+        return redirect(DOMAIN.'admin/temp/'.$id);
+    }
+
+    /**
+     * 设置视频链接
+     */
+    public function setLink(Request $request,$id)
+    {
+        //判断视频链接
+        $linkType = $request->linkType;
+        $link = $request->link;
+        if ($linkType==1 && (mb_substr($link,0,4)!='http'||mb_substr($link,mb_strlen($link)-4,4)!='.swf')) {
+            echo "<script>alert('Flash代码格式有误！');history.go(-1);</script>";exit;
+        } elseif ($linkType==2 && mb_substr($link,0,6)!='<embed') {
+            echo "<script>alert('html代码格式有误！');history.go(-1);</script>";exit;
+        } elseif ($linkType==3 && mb_substr($link,0,7)!='<iframe') {
+            echo "<script>alert('html代码格式有误！');history.go(-1);</script>";exit;
+        }
+        $data = [
+            'id'    =>  $id,
+            'linkType'  =>  $linkType,
+            'link'  =>  $link,
+        ];
+        $apiTemp = ApiTempPro::setLink($data);
+        if ($apiTemp['code']!=0) {
+            echo "<script>alert('".$apiTemp['msg']."');history.go(-1);</script>";exit;
         }
         return redirect(DOMAIN.'admin/temp/'.$id);
     }
@@ -111,13 +139,53 @@ class TempProController extends BaseController
     /**
      * 设置 isshow
      */
-    public function setIsShow($id,$isshow)
+    public function setIsShow()
     {
-        $rst = ApiTempPro::isShow($id,$isshow);
-        if ($rst['code']!=0) {
-            echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
+        if (AjaxRequest::ajax()) {
+            $id = Input::get('id');
+            $isshow = Input::get('isshow');
+            if (!$id || !$isshow) {
+                echo json_encode(array('code'=>-2, 'msg'=>'参数错误！'));exit;
+            }
+            $rst = ApiTempPro::setShow($id,$isshow);
+            if ($rst['code']!=0) {
+                echo json_encode(array('code'=>-3, 'msg'=>$rst['msg']));exit;
+            }
+            echo json_encode(array('code'=>0, 'msg'=>'操作成功！'));exit;
         }
-        return redirect(DOMAIN.'admin/temp/'.$id);
+        echo json_encode(array('code'=>-1, 'msg'=>'数据错误！'));exit;
+    }
+
+    /**
+     * 设置模板总背景
+     */
+    public function setTempBg(Request $request,$tempid)
+    {
+        if (!in_array($request->isbg,[0,1,2])) {
+            echo "<script>alert('数据错误！');history.go(-1);</script>";exit;
+        }
+        if ($request->isbg==1 && !$request->bgcolor) {
+            echo "<script>alert('背景色选择错误！');history.go(-1);</script>";exit;
+        } elseif ($request->isbg==2 && !isset($request->url_ori)) {
+            echo "<script>alert('背景图片未上传！');history.go(-1);</script>";exit;
+        }
+        if ($request->isbg==2) {
+            $imgStr = $this->uploadOnlyImg($request,'url_ori');
+            if (!$imgStr) {
+                echo "<script>alert('图片上传有误！');history.go(-1);</script>";exit;
+            }
+        }
+        $data = [
+            'id'    =>  $request->tempid,
+            'isbg'  =>  $request->isbg,
+            'bgcolor'   =>  $request->bgcolor,
+            'bgimg'   =>  isset($imgStr) ? $imgStr : '',
+        ];
+        $apiTemp = ApiTempPro::setAttr($data);
+        if ($apiTemp['code']!=0) {
+            echo "<script>alert('".$apiTemp['msg']."');history.go(-1);</script>";exit;
+        }
+        return redirect(DOMAIN.'admin/t/'.$request->tempid.'/layer');
     }
 
     /**
@@ -182,17 +250,23 @@ class TempProController extends BaseController
      */
     public function getPreview($id)
     {
-        $apiKey = ApiTempFrame::getFramesByTempid($id);
-        if ($apiKey['code']!=0) {
+        $apiFrame = ApiTempFrame::getFramesByTempid($id);
+        if ($apiFrame['code']!=0) {
             echo "<script>alert('没有预览！');history.go(-1);</script>";exit;
         }
-        $rst = ApiTempPro::getPreview($id);
-        if ($rst['code']!=0) {
-            echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
+        $apiTemp = ApiTempPro::getPreview($id);
+        if ($apiTemp['code']!=0) {
+            echo "<script>alert('".$apiTemp['msg']."');history.go(-1);</script>";exit;
+        }
+        $temp = $apiTemp['data']['temp'];
+        $temp['layerNum'] = count($apiTemp['data']['layer']);
+        $apiLayer = ApiTempLayer::index($id);
+        if ($apiLayer['code']!=0) {
+            echo "<script>alert('没有预览！');history.go(-1);</script>";exit;
         }
         $result = [
-            'layers' => $rst['data'],
-            'tempid' => $id,
+            'temp' => $temp,
+            'layers' => $apiLayer['data'],
         ];
         return view('admin.layer.onetemp', $result);
     }
@@ -202,6 +276,16 @@ class TempProController extends BaseController
      */
     public function getPreTemp($id)
     {
+        $apiTemp = ApiTempPro::getPreview($id,2);
+        if ($apiTemp['code']!=0) {
+            echo "<script>alert('".$apiTemp['msg']."');history.go(-1);</script>";exit;
+        }
+        $result = [
+            'temp' => $apiTemp['data']['temp'],
+            'layers' => $apiTemp['data']['layer'],
+            'layerModel' => $this->getLayerModel(),
+        ];
+        return view('admin.layer.templayers', $result);
     }
 
 
@@ -229,6 +313,15 @@ class TempProController extends BaseController
     public function getModel()
     {
         $rst = ApiProduct::getModel();
+        return $rst['code']==0 ? $rst['model'] : [];
+    }
+
+    /**
+     * 获取 layerModel
+     */
+    public function getLayerModel()
+    {
+        $rst = ApiTempLayer::getModel();
         return $rst['code']==0 ? $rst['model'] : [];
     }
 }

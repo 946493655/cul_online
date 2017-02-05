@@ -2,7 +2,10 @@
 
 <style>
     body { margin:0;padding:0;font-family:'微软雅黑'; }
-    #preframe { width:800px;height:450px;background:#000000; }
+    #preframe {
+        width:800px; height:450px;
+        @if(isset($attrs['isbigbg'])&&$attrs['isbigbg']) background:{{$attrs['bigbg']}};@endif
+    }
 
     /*以下样式动态获取*/
     #attr {
@@ -34,9 +37,9 @@
         @if($layer)
             animation-name:{{$layer['a_name']}};
             animation-duration:{{$layer['timelong']}}s;
-            animation-delay:{{$layer['delay']}}s;
-            animation-timing-function:ease;
-            animation-direction:normal;
+            {{--animation-delay:{{$layer['delay']}}s;--}}
+            {{--animation-timing-function:ease;--}}
+            {{--animation-direction:normal;--}}
         @endif
     }
 

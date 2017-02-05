@@ -1,15 +1,20 @@
 <style>
     body { margin:0;padding:0;font-family:'微软雅黑'; }
     /*===div的滚动条修改===*/
-    #menu ::-webkit-scrollbar { width:20px;height:0px; }
-    #menu ::-webkit-scrollbar-corner { background:transparent; }
+    #menu { margin-top:5px;padding:5px;padding-bottom:20px;width:175px;height:450px;color:grey;background:black;
+        border-left:1px solid grey;overflow:scroll;position:absolute;top:-10px;left:800px; }
+    /*#menu ::-webkit-scrollbar-corner { background:transparent; }*/
+    #menu::-webkit-scrollbar { width:5px; }
+    #menu::-webkit-scrollbar-track{ background-color:#1a1a1a; }
+    #menu::-webkit-scrollbar-thumb{ background-color:#4a4a4a; }
+    #menu::-webkit-scrollbar-thumb:hover { background-color:#6a6a6a; }
+    #menu::-webkit-scrollbar-thumb:active { background-color:#6a6a6a; }
     /*===input的color默认颜色更改===*/
     input[type="color"] { padding:0;height:20px;border:0;cursor:pointer;position:relative;top:6px; }
-    ::-webkit-color-swatch { padding:0 25px;height:15px;border:2px solid grey;position:relative;top:-6px;left:-7px; }
+    input[type="color"]::-webkit-color-swatch { padding:0 25px;height:15px;border:2px solid grey;position:relative;top:-6px;left:-7px; }
 
     /*右侧菜单面板*/
-    #menu { margin-top:5px;padding:5px;padding-bottom:20px;width:190px;height:450px;color:grey;background:black;overflow:scroll;position:relative;top:-460px;left:800px; }
-    #menu #title { width:200px;color:#4d4d4d;position:fixed;top:0px;z-index:10;background:black; }
+    #menu #title { width:180px;color:#4d4d4d;position:fixed;top:0px;z-index:10;background:black; }
     #menu .menu { margin:0;padding:5px 0;padding-left:10px;border-bottom:1px dashed #212121; }
     #menu a { color:grey;text-decoration:none; }
     #menu a:hover { color:orangered; }
@@ -21,13 +26,20 @@
     #menu textarea { margin:5px 0;padding:5px;width:140px;height:100px;border:1px solid #333;border-radius:3px;color:orangered;background:#333;resize:none; }
     #menu input[type="submit"] { width:80px;border:1px solid #333; }
     #menu input[type="submit"]:hover { border:1px solid #660000; }
-    #submit { margin-left:5px;margin-top:10px; }
-    #submit .submit { padding:5px 10px;width:75px;font-size:14px;color:lightgrey;background:#333;cursor:pointer; }
+    #submit { padding:5px 10px;width:170px;background:#1a1a1a;position:fixed;top:420px;left:800px;z-index:10; }
+    #submit .submit { padding:6px 10px;font-size:16px;color:lightgrey;cursor:pointer; }
 
     /*动画窗口*/
+    #tempbg {
+        width:800px; height:450px;overflow:hidden;
+        @if(!isset($tempAttrArr['isbg'])||(isset($tempAttrArr['isbg'])&&!$tempAttrArr['isbg'])){{'background:#9a9a9a;'}}
+        @elseif(isset($tempAttrArr['isbg'])&&$tempAttrArr['isbg']==1){{'background:'.$tempAttrArr['bgcolor'].';'}}
+        @endif
+    }
     #iframe {
         width:800px; height:450px;
-        background:{{(isset($attrs['isbigbg'])&&$attrs['isbigbg'])?$attrs['bigbg']:'#6a6a6a'}};
+        @if(isset($attrs['isbigbg'])&&$attrs['isbigbg']) background:{{$attrs['bigbg']}};@endif
+        position:absolute;top:0;left:0;
         overflow:hidden;
     }
     #iframe #attr_default {
@@ -39,6 +51,7 @@
     #iframe #attr {
         margin:100px auto;padding:5px;
         overflow:hidden;
+        /*transform:rotate(45deg);*/
     @if($attrs)
         width:{{$attrs['width']?$attrs['width']:'300'}}px;
         height:{{$attrs['height']?$attrs['height']:'100'}}px;
@@ -52,6 +65,11 @@
 
 
 {{--动画窗口--}}
+<div id="tempbg">{{--模板大背景--}}
+    @if(isset($tempAttrArr['isbg'])&&$tempAttrArr['isbg']==2)
+        <img src="{{$tempAttrArr['bgimg']}}">
+    @endif
+</div>
 <div id="iframe">
 @if(!$layers)
     <div style="text-align:center;line-height:420px;color:#333;">没有记录...</div>
@@ -83,19 +101,19 @@
     </div>
     <div class="menu"><a href="javascript:;" title="点击切换" onclick="getMenu(2)">样式属性：</a>
         <div class="menutab" id="menu2" style="display:{{(isset($menutab)&&$menutab==2)?'block':'none'}};">
-            <p>大背景：<label><input type="radio" class="radio" name="isbigbg0" value="0" @if(isset($attrs['isbigbg'])){{!$attrs['isbigbg']?'checked':''}}@endif onclick="isbigbg(0)" onchange="setAttr()">无 </label>
-                <label><input type="radio" class="radio" name="isbigbg1" value="1" @if(isset($attrs['isbigbg'])){{$attrs['isbigbg']?'checked':''}}@else{{'checked'}}@endif onclick="isbigbg(1)" onchange="setAttr()">有 </label></p>
+            <p>大背景：<label><input type="radio" class="radio" name="isbigbg0" value="0" @if(isset($attrs['isbigbg'])){{!$attrs['isbigbg']?'checked':''}}@else{{'checked'}}@endif onclick="isbigbg(0)" onchange="setAttr()">无 </label>
+                <label><input type="radio" class="radio" name="isbigbg1" value="1" @if(isset($attrs['isbigbg'])){{$attrs['isbigbg']?'checked':''}}@endif onclick="isbigbg(1)" onchange="setAttr()">有 </label></p>
             <div id="isbigbg" style="display:{{((isset($attrs['isbigbg'])&&$attrs['isbigbg'])||!isset($attrs['isbigbg']))?'block':'none'}};">
-                <input type="hidden" name="isbigbg" value="{{(isset($attrs['isbigbg'])&&$attrs['isbigbg'])?$attrs['isbigbg']:1}}">
+                <input type="hidden" name="isbigbg" value="{{(isset($attrs['isbigbg'])&&$attrs['isbigbg'])?$attrs['isbigbg']:0}}">
                 <p style="position:relative;top:-6px;">&nbsp;&nbsp;
-                    选颜色：<input type="color" title="点击选择颜色" value="{{(isset($attrs['bigbg'])&&$attrs['bigbg'])?$attrs['bigbg']:'#6a6a6a'}}" onchange="setBigBgColor(this.value)">
-                    <input type="hidden" name="bigbg" value="{{(isset($attrs['bigbg'])&&$attrs['bigbg'])?$attrs['bigbg']:'#6a6a6a'}}">
+                    选颜色：<input type="color" title="点击选择颜色" value="{{(isset($attrs['bigbg'])&&$attrs['bigbg'])?$attrs['bigbg']:'#9a9a9a'}}" onchange="setBigBgColor(this.value)">
+                    <input type="hidden" name="bigbg" value="{{(isset($attrs['bigbg'])&&$attrs['bigbg'])?$attrs['bigbg']:'#9a9a9a'}}">
                 </p>
             </div>
 
-            <p>宽度：<input type="text" name="width" style="width:50px;" value="{{(isset($attrs['width'])&&$attrs['width'])?$attrs['width']:'300'}}" onchange="setAttr()"> px</p>
+            <p>宽度：<input type="text" name="width" style="width:50px;" placeholder="300" value="{{(isset($attrs['width'])&&$attrs['width'])?$attrs['width']:''}}" onchange="setAttr()"> px</p>
 
-            <p>高度：<input type="text" name="height" style="width:50px;" value="{{(isset($attrs['height'])&&$attrs['height'])?$attrs['height']:'100'}}" onchange="setAttr()"> px</p>
+            <p>高度：<input type="text" name="height" style="width:50px;" placeholder="100" value="{{(isset($attrs['height'])&&$attrs['height'])?$attrs['height']:''}}" onchange="setAttr()"> px</p>
 
             <p>边框： <label><input type="radio" class="radio" name="isborder0" value="0" @if(isset($attrs['isborder'])){{!$attrs['isborder']?'checked':''}}@else{{'checked'}}@endif onclick="isborder(0)" onchange="setAttr()">无 </label>
             <label><input type="radio" class="radio" name="isborder1" value="1" @if(isset($attrs['isborder'])){{$attrs['isborder']?'checked':''}}@endif onclick="isborder(1)" onchange="setAttr()">有 </label></p>
@@ -158,7 +176,7 @@
                 <input type="hidden" name="tempid" value="{{$temp['id']}}">
                 <input type="hidden" name="layerid" value="{{$layers['id']}}">
                 <script src="{{PUB}}assets/js/local_pre.js"></script>
-                <input type="button" class="submit" value="[ 找图 ]" onclick="path.click()" style="width:90px;"><br>
+                <input type="button" class="submit" value="[ 找图 ]" onclick="path.click()" style="width:90px;cursor:pointer;"><br>
                 <input type="file" id="path" style="display:none" onchange="url_file.value=this.value;loadImageFile();" name="url_ori">
                 <input type="text" placeholder="本地图片地址" name="url_file" readonly style="width:150px;">
                 <div id="preview" style="width:100px;height:100px;border:1px dotted grey;
@@ -167,13 +185,12 @@
             </form>
         </div>
     </div>
+    <div style="height:50px;"></div>
     @if($hasRedis)
     <div id="submit">
-        <a href="javascript:;" title="点击取消修改" class="submit" onclick="cancel()">取消修改</a>
-        <a href="javascript:;" title="点击确定修改" class="submit" onclick="save()">确定修改</a>
+        <a href="javascript:;" title="点击取消修改" class="submit" onclick="cancel()">取消修改</a><a href="javascript:;" title="点击确定修改" class="submit" onclick="save()">确定修改</a>
     </div>
     @endif
-    <div style="height:50px;"></div>
 @else
     <div class="menu"><a href="javascript:;">待添加...</a></div>
 @endif
@@ -184,17 +201,16 @@
 <script>
     function getMenu(tab){
         var t = 100;
-        $("#menu"+tab).toggle(t);
+        $(".menutab").hide(t);
         if (tab==1) {
-            $("#menu2").hide(t);
-            $("#menu3").hide(t);
+            $("#menu1").show(t);
         } else if (tab==2) {
-            $("#menu1").hide(t);
-            $("#menu3").hide(t);
+            $("#menu2").show(t);
         } else if (tab==3) {
-            $("#menu1").hide(t);
-            $("#menu2").hide(t);
+            $("#menu3").show(t);
             setText();
+        } else if (tab==4) {
+            $("#menu4").show(t);
         }
     }
     function isborder(tab){

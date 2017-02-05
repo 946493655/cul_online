@@ -3,12 +3,13 @@
     body { margin:0;padding:0;font-family:'微软雅黑'; }
     #keys { padding:0 5px;width:980px;height:130px;background:black; }
     #keys #title { margin:0;padding:0 5px;color:#4d4d4d;border-bottom:1px dashed #333;font-size:16px; }
-    #keyframe { width:1000px;height:130px;overflow:scroll; }
-    #keyframe .left {
-        width:75px;
-        @if(isset($frames)&&count($frames)<4)height:100px;@endif
-         border-right:2px dashed #333;
-    }
+    #keyframe { width:1000px;height:130px; }
+    #keyframe .left { width:75px;height:120px;border-right:2px dashed #333;overflow:scroll; }
+    #keyframe .left::-webkit-scrollbar { width:5px; }
+    #keyframe .left::-webkit-scrollbar-track { background-color:#1a1a1a; }
+    #keyframe .left::-webkit-scrollbar-thumb { background-color:#4a4a4a; }
+    #keyframe .left::-webkit-scrollbar-thumb:hover { background-color:#6a6a6a; }
+    #keyframe .left::-webkit-scrollbar-thumb:active { background-color:#6a6a6a; }
     #keyframe .left p { margin:0;margin-top:2px; }
     #keyframe a { color:grey;text-decoration:none; }
     #keyframe a:hover,#keyframe a.curr { color:orangered; }
@@ -64,7 +65,15 @@
                 <a href="javascript:;" title="点击修改透明度动画" class="{{$attr==3?'curr':''}} aleft" id="left_3"
                    onclick="selAttr(3)">透明度</a>
             </p>
-            <div style="height:20px;"></div>
+            <p>
+                <a href="javascript:;" title="点击修改旋转动画" class="{{$attr==4?'curr':''}} aleft" id="left_4"
+                   onclick="selAttr(4)">旋转</a>
+            </p>
+            <p>
+                <a href="javascript:;" title="点击修改缩放动画" class="{{$attr==5?'curr':''}} aleft" id="left_5"
+                   onclick="selAttr(5)">缩放</a>
+            </p>
+            <div style="height:40px;"></div>
         </div>
         <div class="right">
             <div class="dui" id="dui_1" style="display:{{$attr==1?'block':'none'}};">
@@ -105,6 +114,32 @@
                 <span>，</span> &nbsp;
                 @endforeach
             @else <span style="font-size:16px">没有透明度关键帧</span>
+            @endif
+            </div>
+            <div class="dui" id="dui_4" style="display:{{$attr==4?'block':'none'}};">
+            @if($rotateArr)
+                @foreach($rotateArr as $rotate)
+                <input type="text" name="per_{{$rotate['id']}}" value="{{$rotate['per']}}" title="修改该百分比"
+                       onchange="setFrame({{$rotate['id']}})">
+                <span>%-</span>
+                <input type="text" name="val_{{$rotate['id']}}" value="{{$rotate['val']}}" title="修改该值"
+                       onchange="setFrame({{$rotate['id']}})">
+                <span>，</span> &nbsp;
+                @endforeach
+            @else <span style="font-size:16px">没有旋转关键帧</span>
+            @endif
+            </div>
+            <div class="dui" id="dui_5" style="display:{{$attr==5?'block':'none'}};">
+            @if($scaleArr)
+                @foreach($scaleArr as $scale)
+                <input type="text" name="per_{{$scale['id']}}" value="{{$scale['per']}}" title="修改该百分比"
+                       onchange="setFrame({{$scale['id']}})">
+                <span>%-</span>
+                <input type="text" name="val_{{$scale['id']}}" value="{{$scale['val']}}" title="修改该值"
+                       onchange="setFrame({{$scale['id']}})">
+                <span>，</span> &nbsp;
+                @endforeach
+            @else <span style="font-size:16px">没有缩放关键帧</span>
             @endif
             </div>
         </div>

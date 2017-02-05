@@ -9,13 +9,14 @@ class ApiTempLayer
      * 模板动画接口
      */
 
-    public static function index($tempid)
+    public static function index($tempid,$isshow=0)
     {
         $apiUrl = ApiBase::getApiCurl() . '/api/v1/t/layer';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(
-            'tempid' =>  $tempid,
+            'tempid'    =>  $tempid,
+            'isshow'    =>  $isshow,
         ));
         $response = json_decode($curl->response);
         if ($response->error->code != 0) {
@@ -78,6 +79,28 @@ class ApiTempLayer
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, $data);
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+        );
+    }
+
+    /**
+     * 设置动画层隐藏/显示
+     */
+    public static function setIsShow($id,$isshow)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/t/layer/setshow';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'id'    =>  $id,
+            'isshow'    =>  $isshow,
+        ));
         $response = json_decode($curl->response);
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);

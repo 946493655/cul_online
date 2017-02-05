@@ -56,7 +56,7 @@ body { margin:0;font-family:'微软雅黑'; }
 
 /*========== 动画作品列表 ==========*/
 .online_list {
-    margin:30px 0;
+    margin-top:30px;
     height:900px;
     background:rgb(40,40,40);
 }
@@ -93,7 +93,7 @@ body { margin:0;font-family:'微软雅黑'; }
 .online_list .condition div:hover.cate_s,.online_list .condition div.cate_curr { color:orangered; }
 .online_list .condition a:hover,.online_list .condition a.curr { color:orangered; }
 .online_list .list {
-    margin:20px auto;
+    margin:0 auto;
     width:1000px;
 }
 .online_list .list a { text-decoration:none; }

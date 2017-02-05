@@ -23,6 +23,7 @@ class TLayerController extends BaseController
         if ($rstTemp['code']!=0) {
             echo "<script>alert('".$rstTemp['msg']."');history.go(-1);</script>";exit;
         }
+        $tempAttrArr = $rstTemp['data']['attr'] ? unserialize($rstTemp['data']['attr']) : [];
         $rst = ApiTempLayer::index($tempid);
         if ($rst['code']!=0) {
             echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
@@ -38,6 +39,7 @@ class TLayerController extends BaseController
             'datas' => $rst['data'],
             'layerid' => $layerid,
             'layerName' => $rstLayer['data']['name'],
+            'tempAttrArr' => $tempAttrArr,
         ];
         return view('admin.layer.index',$result);
     }
@@ -68,10 +70,12 @@ class TLayerController extends BaseController
      */
     public function show($tempid,$id)
     {
+        //获取模板信息
         $rstTemp = ApiTempPro::show($tempid);
         if ($rstTemp['code']!=0) {
             echo "<script>alert('".$rstTemp['msg']."');history.go(-1);</script>";exit;
         }
+        if ($rstTemp['data']['attr']) { $tempAttrArr = unserialize($rstTemp['data']['attr']); }
         //动画属性：先读缓存，再读数据表记录
         $rstLayer = ApiTempLayer::show($id);
         if ($rstLayer['code']!=0) {
@@ -89,10 +93,11 @@ class TLayerController extends BaseController
         $apilayer = $rstLayer['data'];
         if (!isset($layers) || (isset($layers)&&!$layers)) {
             $layers = [
-                'id'  =>  $apilayer['id'],
-                'name'  =>  $apilayer['name'],
-                'delay' =>  $apilayer['delay'],
-                'timelong'  =>  $apilayer['timelong'],
+                'id' => $apilayer['id'],
+                'name' => $apilayer['name'],
+                'delay' => $apilayer['delay'],
+                'timelong' => $apilayer['timelong'],
+                'isshow' => $apilayer['isshow'],
             ];
         }
         if ((!isset($attrs) || (isset($attrs)&&!$attrs)) && $apilayer['attr']) {
@@ -106,7 +111,6 @@ class TLayerController extends BaseController
                 'img'   =>  $conArr['img'],
             ];
         }
-//        dd($layers,$attrs,$cons);
         $result = [
             'temp' => $rstTemp['data'],
             'model' => $this->getModel(),
@@ -115,6 +119,7 @@ class TLayerController extends BaseController
             'cons' => isset($cons) ? $cons : [],
             'menutab' => isset($menutab) ? $menutab : 1,
             'hasRedis' => (isset($hasRedis)&&$hasRedis) ? 1 : 0,
+            'tempAttrArr' => isset($tempAttrArr) ? $tempAttrArr : [],
         ];
         return view('admin.layer.iframe',$result);
     }
@@ -212,10 +217,6 @@ class TLayerController extends BaseController
                 $data = unserialize($rstRedis);
             }
             $data['menu']['menutab'] = 3;
-//            $data['con'] = [
-//                'iscon' =>  Input::get('iscon'),
-//                'text' =>  Input::get('text'),
-//            ];
             $data['con']['iscon'] = Input::get('iscon');
             $data['con']['text'] = Input::get('text');
             Redis::setex($rediskey,$this->redisTime,serialize($data));
@@ -262,18 +263,12 @@ class TLayerController extends BaseController
                 if (file_exists($img1)) { $oldImgArr[] = $img1; }
             }
         }
-        dd(Input::all(),$tempid,$id);
         $imgStr = $this->uploadOnlyImg(Input::all(),'url_ori',$oldImgArr);
         if (!$imgStr) {
             echo "<script>alert('图片上传有误！');history.go(-1);</script>";exit;
         }
-//        $data['con'] = [
-//            'iscon' =>  Input::get('iscon'),
-//            'img' =>  $imgStr,
-//        ];
         $data['con']['iscon'] = Input::get('iscon');
         $data['con']['img'] = $imgStr;
-        dd($data);
         Redis::setex($rediskey,$this->redisTime,serialize($data));
         return redirect(DOMAIN.'admin/t/'.$tempid.'/layer');
     }
@@ -286,7 +281,6 @@ class TLayerController extends BaseController
         $rediskey = $this->rediskey.$layerid;
         if ($rstRedis=Redis::get($rediskey)) {
             Redis::del($rediskey);
-//            echo "<script>alert('操作成功！');window.location.href='/admin/t/".$tempid."/layer';</script>";exit;
             return redirect(DOMAIN.'admin/t/'.$tempid.'/layer/'.$layerid);
         }
         echo "<script>alert('没有修改过或者修改数据已过期！');history.go(-1);</script>";exit;
@@ -354,6 +348,36 @@ class TLayerController extends BaseController
         Redis::del($this->rediskey.$layerid);
 //        echo "<script>alert('操作成功！');window.location.href='/admin/t/".$tempid."/layer';</script>";exit;
         return redirect(DOMAIN.'admin/t/'.$tempid.'/layer/'.$layerid);
+    }
+
+    /**
+     * 隐藏/显示动画层
+     */
+    public function setIsShow($tempid,$layerid,$isshow)
+    {
+        if (!$tempid || !$layerid || !$isshow) {
+            echo "<script>alert('参数错误！');history.go(-1);</script>";exit;
+        }
+        $apiLayer = ApiTempLayer::setIsShow($layerid,$isshow);
+        if ($apiLayer['code']!=0) {
+            echo "<script>alert('".$apiLayer['msg']."');history.go(-1);</script>";exit;
+        }
+        return redirect(DOMAIN.'admin/temp/preview/'.$tempid);
+    }
+
+    /**
+     * 销毁动画层记录
+     */
+    public function setDelete($tempid,$layerid)
+    {
+        if (!$tempid || !$layerid) {
+            echo "<script>alert('参数错误！');history.go(-1);</script>";exit;
+        }
+        $apiLayer = ApiTempLayer::delete($layerid);
+        if ($apiLayer['code']!=0) {
+            echo "<script>alert('".$apiLayer['msg']."');history.go(-1);</script>";exit;
+        }
+        return redirect(DOMAIN.'admin/temp/preview/'.$tempid);
     }
 
     /**
