@@ -25,7 +25,6 @@ class ApiTempFrame
         }
         return array(
             'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
             'data' => ApiBase::objToArr($response->data),
         );
     }
@@ -47,7 +46,6 @@ class ApiTempFrame
         }
         return array(
             'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
             'data' => ApiBase::objToArr($response->data),
         );
     }
@@ -64,7 +62,6 @@ class ApiTempFrame
         }
         return array(
             'code' => 0,
-//            'msg' => $response->error->msg,
             'data' => ApiBase::objToArr($response->data),
         );
     }

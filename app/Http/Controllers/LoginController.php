@@ -39,7 +39,7 @@ class LoginController extends BaseController
             'ip'=> $ip,
             //以下用户日志用
             'ipaddress'=> $this->getCityByIp($ip),
-            'genre'=>   1,      //1代表用户,2代表管理员
+            'genre'=> 3,      //3代表用户online,4代表管理员online
             'action'=> $_SERVER['REQUEST_URI'],
         ];
         $rstLogin = ApiUsers::doLogin($data);
@@ -90,7 +90,6 @@ class LoginController extends BaseController
         ];
         $userInfo['cookie'] = $_COOKIE;
         Session::put('user',$userInfo);
-//        \Cookie::make('user', $userInfo, 720);       //cookie12小时
 
         //将session放入redis
         Redis::setex('cul_session', $this->redisTime, serialize($userInfo));
@@ -107,7 +106,6 @@ class LoginController extends BaseController
         }
         //去除session
         Session::forget('user');
-//        \Cookie::forget('user');
         Redis::del('cul_session');
         return redirect(DOMAIN.'login');
     }

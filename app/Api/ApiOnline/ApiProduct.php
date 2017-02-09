@@ -12,13 +12,13 @@ class ApiProduct
     /**
      * 列表
      */
-    public static function index($limit=0,$pageCurr=1,$uid=0,$cate=0,$isshow=0)
+    public static function index($limit=0,$pageCurr=1,$uid=0,$isshow=0)
     {
-        $redisKey = 'productList';
-        //判断缓存有没有该数据
-        if ($redisResult = ApiBase::getRedis($redisKey)) {
-            return array('code' => 0, 'data' => unserialize($redisResult));
-        }
+//        $redisKey = 'productList';
+//        //判断缓存有没有该数据
+//        if ($redisResult = ApiBase::getRedis($redisKey)) {
+//            return array('code' => 0, 'data' => unserialize($redisResult));
+//        }
         //没有，接口读取
         $apiUrl = ApiBase::getApiCurl() . '/api/v1/product';
         $curl = new Curl();
@@ -27,7 +27,6 @@ class ApiProduct
             'limit' =>  $limit,
             'page'  =>  $pageCurr,
             'uid'   =>  $uid,
-            'cate'  =>  $cate,
             'isshow'    =>  $isshow,
         ));
         $response = json_decode($curl->response);
@@ -36,7 +35,27 @@ class ApiProduct
         }
         return array(
             'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
+            'data' => ApiBase::objToArr($response->data),
+        );
+    }
+
+    /**
+     * 通过 id 获取记录
+     */
+    public static function show($id)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/show';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'id'   =>  $id,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
             'data' => ApiBase::objToArr($response->data),
         );
     }
@@ -60,7 +79,6 @@ class ApiProduct
         return array(
             'code' => 0,
             'data' => ApiBase::objToArr($response->data),
-            'model' => ApiBase::objToArr($response->model),
         );
     }
 
@@ -83,7 +101,6 @@ class ApiProduct
         return array(
             'code' => 0,
             'data' => ApiBase::objToArr($response->data),
-            'model' => ApiBase::objToArr($response->model),
         );
     }
 
@@ -100,7 +117,10 @@ class ApiProduct
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
     }
 
     /**
@@ -116,15 +136,18 @@ class ApiProduct
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
     }
 
     /**
-     * 修改缩略图、视频链接
+     * 根据 id 更新模板缩略图 thumb
      */
-    public static function modify2Link($data)
+    public static function setThumb($data)
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/modify2link';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/setthumb';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, $data);
@@ -132,7 +155,51 @@ class ApiProduct
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+        );
+    }
+
+    /**
+     * 根据 id 更新模板缩略图 linkType、link
+     */
+    public static function setLink($data)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/setlink';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, $data);
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
+    }
+
+    /**
+     * 根据 uid、id 设置是否显示
+     */
+    public static function setIsShow($uid,$id)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/isshow';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'uid'   =>  $uid,
+            'id' =>  $id,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+        );
     }
 
     /**
@@ -151,7 +218,32 @@ class ApiProduct
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
+    }
+
+    /**
+     * 预览动画
+     */
+    public static function getPreview($id,$isshow=0)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/preview';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'id'    =>  $id,
+            'isshow'    =>  $isshow,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
+            'data' => ApiBase::objToArr($response->data),
+        );
     }
 
     /**
@@ -171,6 +263,6 @@ class ApiProduct
         return array(
             'code' => 0,
             'model' => ApiBase::objToArr($response->model),
-        );
+            );
     }
 }

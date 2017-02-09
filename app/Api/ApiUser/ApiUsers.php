@@ -24,7 +24,6 @@ class ApiUsers
         }
         return array(
             'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
             'data' => ApiBase::objToArr($response->data),
         );
     }
@@ -46,7 +45,6 @@ class ApiUsers
         }
         return array(
             'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
             'data' => ApiBase::objToArr($response->data),
         );
     }
@@ -68,7 +66,6 @@ class ApiUsers
         }
         return array(
             'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
             'data' => ApiBase::objToArr($response->data),
         );
     }
@@ -90,7 +87,6 @@ class ApiUsers
         }
         return array(
             'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
             'data' => ApiBase::objToArr($response->data),
         );
     }
@@ -112,9 +108,8 @@ class ApiUsers
         }
         return array(
             'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
             'data' => ApiBase::objToArr($response->data),
-        );
+            );
     }
 
     /**
@@ -132,7 +127,10 @@ class ApiUsers
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
     }
 
     /**
@@ -148,7 +146,10 @@ class ApiUsers
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
     }
 
     /**
@@ -166,7 +167,10 @@ class ApiUsers
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
     }
 
     /**

@@ -10,9 +10,8 @@
             <a href="javascript:void(0);" onclick="getEditPro1()" title="新产品增加">+ 添加产品</a>
         </div>
         <div class="list">
-            @if(count($datas)>1)
+            @if(count($datas))
                 @foreach($datas as $kdata=>$data)
-                    @if(is_numeric($kdata))
             <a href="{{DOMAIN}}admin/temp/{{$data['id']}}" title="点击进入调整 {{$data['name']}}">
                 <div class="prolist">
                     <div class="pro_one">
@@ -27,10 +26,9 @@
                     </div>
                 </div>
             </a>
-                    @endif
                 @endforeach
             @endif
-            @for($i=0;$i<$datas['pagelist']['limit']+1-count($datas);++$i)
+            @for($i=0;$i<$pagelist['limit']+1-count($datas);++$i)
             <a href="javascript:void(0);">
                 <div class="prolist">
                     <div class="pro_one">+待添加</div>

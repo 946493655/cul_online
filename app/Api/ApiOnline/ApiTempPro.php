@@ -11,11 +11,11 @@ class ApiTempPro
 
     public static function index($limit=0,$pageCurr=1,$cate=0,$isshow=0)
     {
-        $redisKey = 'tempProList';
-        //判断缓存有没有该数据
-        if ($redisResult = ApiBase::getRedis($redisKey)) {
-            return array('code' => 0, 'data' => unserialize($redisResult));
-        }
+//        $redisKey = 'tempProList';
+//        //判断缓存有没有该数据
+//        if ($redisResult = ApiBase::getRedis($redisKey)) {
+//            return array('code' => 0, 'data' => unserialize($redisResult));
+//        }
         //没有，接口读取
         $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp';
         $curl = new Curl();
@@ -32,7 +32,6 @@ class ApiTempPro
         }
         return array(
             'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
             'data' => ApiBase::objToArr($response->data),
         );
     }
@@ -53,7 +52,6 @@ class ApiTempPro
         }
         return array(
             'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
             'data' => ApiBase::objToArr($response->data),
         );
     }
@@ -63,7 +61,7 @@ class ApiTempPro
      */
     public static function getOneByShow($id,$isshow)
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/getonebyshow';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/getone';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(
@@ -76,7 +74,6 @@ class ApiTempPro
         }
         return array(
             'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
             'data' => ApiBase::objToArr($response->data),
         );
     }
@@ -98,7 +95,6 @@ class ApiTempPro
         }
         return array(
             'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
             'data' => ApiBase::objToArr($response->data),
         );
     }
@@ -116,7 +112,10 @@ class ApiTempPro
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
     }
 
     /**
@@ -132,26 +131,11 @@ class ApiTempPro
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
     }
-
-//    /**
-//     * 根据 id
-//     * 更新模板缩略图、视频2个链接
-//     * thumb、linkType、link
-//     */
-//    public static function modify2Link($data)
-//    {
-//        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/modify2link';
-//        $curl = new Curl();
-//        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
-//        $curl->post($apiUrl, $data);
-//        $response = json_decode($curl->response);
-//        if ($response->error->code != 0) {
-//            return array('code' => -1, 'msg' => $response->error->msg);
-//        }
-//        return array('code' => 0, 'msg' => $response->error->msg);
-//    }
 
     /**
      * 根据 id 更新模板缩略图 thumb
@@ -166,7 +150,10 @@ class ApiTempPro
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
     }
 
     /**
@@ -182,7 +169,10 @@ class ApiTempPro
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
     }
 
     /**
@@ -201,7 +191,10 @@ class ApiTempPro
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
     }
 
     /**
@@ -217,7 +210,10 @@ class ApiTempPro
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
     }
 
     /**
@@ -235,7 +231,10 @@ class ApiTempPro
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
     }
 
     /**
@@ -253,7 +252,10 @@ class ApiTempPro
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);
         }
-        return array('code' => 0, 'msg' => $response->error->msg);
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+            );
     }
 
     /**
@@ -274,7 +276,6 @@ class ApiTempPro
         }
         return array(
             'code' => 0,
-            'model' => ApiBase::objToArr($response->model),
             'data' => ApiBase::objToArr($response->data),
         );
     }

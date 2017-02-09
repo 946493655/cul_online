@@ -15,7 +15,7 @@
     </div>
     @if(isset($model)&&isset($cate))
     <div class="attr" style="height:{{count($model['cates'])>13?40:20}}px;">
-        <div class="cate_s">模板类型：</div>
+        <div class="cate_s">类型：</div>
         <div class="{{$cate==0?'cate_curr':'cate_s'}}" onclick="jump(0)">所有</div>
         @foreach($model['cates'] as $kcate=>$vcate)
             <div class="{{$cate==$kcate?'cate_curr':'cate_s'}}" onclick="jump({{$kcate}})">{{ $vcate }}</div>

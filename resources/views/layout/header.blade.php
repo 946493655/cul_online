@@ -6,7 +6,7 @@
       <span>
         <div class="head_left">
             @if(Session::has('user'))
-                <a href="{{DOMAIN}}u/product" style="color:orangered;">{{ Session::get('user.username') }}创作管理</a> &nbsp;
+                <a href="{{DOMAIN}}u/product" style="color:orangered;">{{ Session::get('user.username') }}创作中心</a> &nbsp;
                 <a href="{{DOMAIN}}login/logout" style="color:orangered;">退出</a>
             @else
                 <a href="{{DOMAIN}}login" style="color:orangered;">用户在此登录</a>

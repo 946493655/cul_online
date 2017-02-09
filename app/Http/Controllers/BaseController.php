@@ -10,6 +10,7 @@ class BaseController extends Controller
      * 前台、用户基础控制器
      */
 
+    protected $limit = 12;      //每页显示的记录数
     protected $userid;
 
     public function __construct()

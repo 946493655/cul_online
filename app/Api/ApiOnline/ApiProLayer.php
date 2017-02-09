@@ -3,20 +3,19 @@ namespace App\Api\ApiOnline;
 
 use Curl\Curl;
 
-class ApiTempLayer
+class ApiProLayer
 {
     /**
-     * 模板动画接口
+     * 产品动画层接口
      */
 
-    public static function index($tempid,$isshow=0)
+    public static function index($pro_id)
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/t/layer';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/pro/layer';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(
-            'tempid'    =>  $tempid,
-            'isshow'    =>  $isshow,
+            'pro_id'    =>  $pro_id,
         ));
         $response = json_decode($curl->response);
         if ($response->error->code != 0) {
@@ -28,16 +27,13 @@ class ApiTempLayer
         );
     }
 
-    /**
-     * 通过 id 获取一条记录
-     */
     public static function show($id)
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/t/layer/show';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/pro/layer/show';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(
-            'id' =>  $id,
+            'id'    =>  $id,
         ));
         $response = json_decode($curl->response);
         if ($response->error->code != 0) {
@@ -49,12 +45,9 @@ class ApiTempLayer
         );
     }
 
-    /**
-     * 添加动画设置
-     */
     public static function add($data)
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/t/layer/add';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/pro/layer/add';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, $data);
@@ -68,12 +61,9 @@ class ApiTempLayer
         );
     }
 
-    /**
-     * 修改动画设置
-     */
     public static function modify($data)
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/t/layer/modify';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/pro/layer/modify';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, $data);
@@ -87,15 +77,13 @@ class ApiTempLayer
         );
     }
 
-    /**
-     * 设置动画层隐藏/显示
-     */
-    public static function setIsShow($id,$isshow)
+    public static function setIsShow($uid,$id,$isshow)
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/t/layer/setshow';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/pro/layer/isshow';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(
+            'uid'   =>  $uid,
             'id'    =>  $id,
             'isshow'    =>  $isshow,
         ));
@@ -109,16 +97,14 @@ class ApiTempLayer
         );
     }
 
-    /**
-     * 彻底删除动画设置
-     */
-    public static function delete($id)
+    public static function delete($uid,$id)
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/t/layer/delete';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/pro/layer/delete';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(
-            'id'    =>  $id
+            'uid'   =>  $uid,
+            'id'    =>  $id,
         ));
         $response = json_decode($curl->response);
         if ($response->error->code != 0) {
@@ -135,7 +121,7 @@ class ApiTempLayer
      */
     public static function getModel()
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/t/layer/getmodel';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/pro/layer/getmodel';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(

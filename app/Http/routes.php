@@ -28,26 +28,10 @@ Route::group(['prefix'=>'/','namespace'=>'Home'], function(){
 });
 
 
-/**
- * 用户登录
+/*********
+ * 会员后台
  */
-Route::group(['prefix'=>'login'], function(){
-    Route::get('/', 'LoginController@index');
-    Route::post('dologin', 'LoginController@dologin');
-    Route::get('logout', 'LoginController@logout');
-});
-
-/**
- * 用户房间
- */
-Route::group(['prefix'=>'u','middleware' =>'MemberAuth','namespace'=>'Member'], function(){
-    Route::get('product/s/{cate}', 'HomeController@index');
-    Route::get('product/apply/{tempid}', 'HomeController@getApply');
-    Route::post('product/{id}', 'HomeController@update');
-    Route::post('product/link/{id}', 'HomeController@set2Link');
-    Route::get('product/delete/{id}', 'HomeController@forceDelete');
-    Route::resource('product', 'HomeController');
-});
+include('Routes/routes_member.php');
 
 
 /*********

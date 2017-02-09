@@ -79,7 +79,7 @@ body { margin:0;font-family:'微软雅黑'; }
     border:0;
 }
 .online_list .condition .cate_s,.online_list .condition .cate_curr {
-    margin-right:5px;
+    margin-right:3px;
     margin-bottom:3px;
     padding:0 5px;
     text-decoration:none;
@@ -181,6 +181,22 @@ body { margin:0;font-family:'微软雅黑'; }
 .editproduct .msg a:hover {
     background:lightgrey;
 }
+.editproduct .qrcode {
+    padding:20px;
+    width:260px; height:300px;
+    background:white;
+    position:absolute;left:40%;top:200px;
+}
+.editproduct .qrcode p { margin:0;text-align:center; }
+.editproduct .qrcode a.close {
+    padding:10px; padding-left:15px;
+    width:40px;
+    text-decoration:none;
+    color:white;
+    background:red;
+    position:absolute;top:0;left:300px;
+}
+.editproduct .qrcode a:hover { color:lightgrey; }
 
 /*渲染列表*/
 .online_list table.list { color:grey; }
@@ -197,15 +213,11 @@ body { margin:0;font-family:'微软雅黑'; }
     background:rgb(30,30,30);
     overflow:hidden;
 }
-.online_list table.list #gettemp {
-    margin:10px auto;
+.online_list table.list .gettemp {
     padding:10px 40px;
-    width:100px;
-    text-align:center;
     background:#000;
-    cursor:pointer;
 }
-.online_list table.list div:hover#gettemp {
+.online_list table.list div:hover.gettemp {
     color:orangered;
     background:#333;
 }

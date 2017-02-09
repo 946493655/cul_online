@@ -4,14 +4,14 @@
         @include('admin.common.menu')
 
         <table class="list">
-            <tr><td colspan="2">产品编号：{{$data['serial']}}</td></tr>
             <tr>
-                <td>产品名称：{{$data['name']}}</td>
-                <td>产品类型：{{$data['cateName']}}</td>
+                <td>模板名称：{{$data['name']}}</td>
+                <td>模板编号：{{$data['serial']}}</td>
+                <td>模板类型：{{$data['cateName']}}</td>
             </tr>
-            <tr><td colspan="2">产品介绍：{{$data['intro']}}</td></tr>
-            <tr><td colspan="2"><span style="float:right;">发布时间：{{$data['createTime']}}</span></td></tr>
-            <tr><td colspan="2" style="border:0;">
+            <tr><td colspan="5">模板介绍：{{$data['intro']}}</td></tr>
+            <tr><td colspan="5"><span style="float:right;">发布时间：{{$data['createTime']}}</span></td></tr>
+            <tr><td colspan="5" style="border:0;">
                 @if($data['thumb'])
                     <div id="toplay">
                         <a @if($data['link']) href="{{$data['link']}}" target="_blank" title="点击跳转到 {{$data['link']}}"
@@ -25,35 +25,33 @@
                         </p>
                     </div>
                 @endif
-                    <input type="hidden" name="linkType" value="{{$data['linkType']}}">
-                    <input type="hidden" name="link" value="{{$data['link']}}">
-                    <input type="hidden" name="id" value="{{$data['id']}}">
-                    <input type="hidden" name="uid" value="{{Session::has('user')?Session::get('user.uid'):0}}">
-                    <div id="editpro">
-                        <a href="javascript:void(0);" onclick="getReturnPre()">返回</a>
-                        <a href="javascript:void(0);" onclick="getEditPro1()">修改模板</a>
-                        @if($data['thumb'] || $data['link'])
-                        <a href="javascript:void(0);" onclick="getThumb()">缩略图</a>
-                        <a href="javascript:void(0);" onclick="getLink()">视频链接</a>
+                <div id="editpro">
+                    <a href="javascript:void(0);" onclick="getReturnPre()">返回</a>
+                    <a href="javascript:void(0);" onclick="getEditPro1()">修改模板</a>
+                    <a href="javascript:void(0);" onclick="getThumb()">缩略图</a>
+                    <a href="javascript:void(0);" onclick="getLink()">视频链接</a>
+                    <a href="@if($data['linkType']==4){{$data['link']}}@else javascript:void(0);@endif"
+                       @if($data['linkType']==4) target="_blank" @else onclick="getPlay()" @endif>播放</a>
+                    <a href="{{DOMAIN}}admin/t/{{$data['id']}}/layer">细节修改</a>
+                    <span id="isshow">
+                        @if($data['isshow']==2)
+                        <a href="javascript:;" title="设置前台模板隐藏" onclick="setShow(1)">前台隐藏</a>
+                        @else
+                        <a href="javascript:;" title="设置前台模板显示" onclick="setShow(2)">前台显示</a>
                         @endif
-                        <a href="@if($data['linkType']==4){{$data['link']}}@else javascript:void(0);@endif"
-                           @if($data['linkType']==4) target="_blank" @else onclick="getPlay()" @endif>播放</a>
-                        <a href="{{DOMAIN}}admin/t/{{$data['id']}}/layer">细节修改</a>
-                        <span id="isshow">
-                            @if($data['isshow']==2)
-                            <a href="javascript:;" title="设置前台模板隐藏" onclick="setShow(1)">前台隐藏</a>
-                            @else
-                            <a href="javascript:;" title="设置前台模板显示" onclick="setShow(2)">前台显示</a>
-                            @endif
-                        </span>
-                        @if(Session::get('admin.username')=='jiuge')
-                        <a href="javascript:void(0);" title="彻底删除模板" onclick="getDel()">删除模板</a>
-                        @endif
-                    </div>
-                </td></tr>
+                    </span>
+                    @if(Session::get('admin.username')=='jiuge')
+                    <a href="javascript:void(0);" title="彻底删除模板" onclick="getDel()">删除模板</a>
+                    @endif
+                </div>
+            </td></tr>
         </table>
     </div>
 
+    <input type="hidden" name="linkType" value="{{$data['linkType']}}">
+    <input type="hidden" name="link" value="{{$data['link']}}">
+    <input type="hidden" name="id" value="{{$data['id']}}">
+    <input type="hidden" name="uid" value="{{Session::has('user')?Session::get('user.uid'):0}}">
     <input type="hidden" name="_token" value="{{ csrf_token() }}">
     <input type="hidden" name="tempid" value="{{$data['id']}}">
     {{--弹出框：修改产品数据--}}
@@ -116,7 +114,7 @@
                 </select>
             </p>
             <p>视频链接：
-                <input type="text" placeholder="例：" minlength="2" maxlength="20" required
+                <input type="text" placeholder="例：" minlength="2" required
                        name="link" value="{{$data['link']}}">
             </p>
             <p style="text-align:center">

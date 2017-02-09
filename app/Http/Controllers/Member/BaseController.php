@@ -16,5 +16,6 @@ class BaseController extends Controller
         if (!Session::has('user')) {
             echo "<script>alert('没有登录！');window.location.href='/login';</script>";exit;
         }
+        $this->userid = Session::get('user.uid');
     }
 }

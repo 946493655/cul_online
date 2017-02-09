@@ -51,7 +51,7 @@ class LoginController extends BaseController
             'uid'=> $rstAdmin['data']['id'],
             'uname'=> $uname,
             'ip'=> $ip,
-            'genre'=> 2,    //2代表管理员
+            'genre'=> 4,    //2代表用户online，4代表管理员online
             'serial'=> $serial,
             'ipaddress'=> $ipaddress,
             'action'=> $_SERVER['REQUEST_URI'],

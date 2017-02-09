@@ -26,8 +26,11 @@ class TempProController extends BaseController
     {
         $pageCurr = isset($_POST['pageCurr'])?$_POST['pageCurr']:1;
         $prefix_url = DOMAIN.'admin/temp';
+        $datas = $this->query($pageCurr,$cate);
+        $pagelist = $this->getPageList($datas,$prefix_url,$this->limit,$pageCurr);
         $result = [
-            'datas' => $this->query($pageCurr,$prefix_url,$cate),
+            'datas' => $datas,
+            'pagelist' => $pagelist,
             'prefix_url' => $prefix_url,
             'model' => $this->getModel(),
             'cate' => $cate,
@@ -83,7 +86,10 @@ class TempProController extends BaseController
         //去除老图片
         $oldImgArr = [];
         $rstTemp = ApiTempPro::show($id);
-        if ($rstTemp['code']==0 && $rstTemp['data']['thumb']) {
+        if ($rstTemp['code']!=0) {
+            echo "<script>alert('".$rstTemp['msg']."');history.go(-1);</script>";exit;
+        }
+        if ($rstTemp['data']['thumb']) {
             $thumbArr = explode('/',$rstTemp['data']['thumb']);
             if (mb_substr($thumbArr[0],0,4)=='http') {
                 unset($thumbArr[0]); unset($thumbArr[1]); unset($thumbArr[2]);
@@ -260,7 +266,7 @@ class TempProController extends BaseController
         }
         $temp = $apiTemp['data']['temp'];
         $temp['layerNum'] = count($apiTemp['data']['layer']);
-        $apiLayer = ApiTempLayer::index($id);
+        $apiLayer = ApiTempLayer::index($id,0);
         if ($apiLayer['code']!=0) {
             echo "<script>alert('没有预览！');history.go(-1);</script>";exit;
         }
@@ -302,11 +308,10 @@ class TempProController extends BaseController
         );
     }
 
-    public function query($pageCurr,$prefix_url,$cate)
+    public function query($pageCurr,$cate)
     {
         $rst = ApiTempPro::index($this->limit,$pageCurr,$cate);
         $datas = $rst['code']==0 ? $rst['data'] : [];
-        $datas['pagelist'] = $this->getPageList($datas,$prefix_url,$this->limit,$pageCurr);
         return $datas;
     }
 

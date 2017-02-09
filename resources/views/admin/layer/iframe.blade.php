@@ -136,7 +136,7 @@
             <p>背景色：<label><input type="radio" class="radio" name="isbg0" value="0" @if(isset($attrs['isbg'])){{!$attrs['isbg']?'checked':''}}@endif onclick="isbg(0)" onchange="setAttr()">无 </label>
             <label><input type="radio" class="radio" name="isbg1" value="1" @if(isset($attrs['isbg'])){{$attrs['isbg']?'checked':''}}@else{{'checked'}}@endif onclick="isbg(1)" onchange="setAttr()">有 </label></p>
             <div id="isbg" style="display:{{((isset($attrs['isbg'])&&$attrs['isbg'])||!isset($attrs['isbg']))?'block':'none'}};">
-                <input type="hidden" name="isbg" value="{{(isset($attrs['isbg'])&&$attrs['isbg'])?$attrs['isbg']:1}}">
+                <input type="hidden" name="isbg" value="{{(isset($attrs['isbg'])&&!$attrs['isbg'])?$attrs['isbg']:1}}">
                 <p style="position:relative;top:-6px;">&nbsp;&nbsp;
                     选颜色：<input type="color" title="点击选择颜色" value="{{(isset($attrs['bg'])&&$attrs['bg'])?$attrs['bg']:'#ffffff'}}" onchange="setBgColor(this.value)">
                     <input type="hidden" name="bg" value="{{(isset($attrs['bg'])&&$attrs['bg'])?$attrs['bg']:'#ffffff'}}">

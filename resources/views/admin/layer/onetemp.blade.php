@@ -30,7 +30,7 @@
                 <td>模板编号：{{$temp['serial']}}</td>
                 <td>动画数量：{{$temp['layerNum']}}</td>
                 <td>创建时间：{{$temp['createTime']}}</td>
-                <td><a href="">刷新</a></td>
+                <td><a href="" title="点此刷新重播，或按F5">刷新</a></td>
             </tr>
             <tr>
                 <td colspan="5">
@@ -61,6 +61,7 @@
         <div class="content">
             <p><b id="del_title">彻底删除动画</b></p>
             <p>
+                <input type="hidden" name="layerid" value="">
                 <a href="javascript:;" id="del_sure">确定</a>
                 <a href="javascript:;" onclick="$('#popup').hide(100);">取消</a>
             </p>
@@ -71,8 +72,13 @@
         function delLayer(layerid){
             var layerName = $("input[name='layerName_"+layerid+"']").val();
             $("#del_title").html("彻底删除动画 - "+layerName);
-            $("#del_sure")[0].href = '{{DOMAIN}}admin/t/{{$temp['id']}}/'+layerid+'/layer/delete';
+            $("#del_sure")[0].value = layerid;
             $("#popup").show(100);
+        }
+        function delSure(){
+            var layerid = $("input[name='layerid']").val();
+            if (layerid==0 || layerid=='') { alert('动画层选择错误！');return; }
+            $("#del_sure")[0].href = '{{DOMAIN}}admin/t/{{$temp['id']}}/'+layerid+'/layer/delete';
         }
     </script>
 @stop
