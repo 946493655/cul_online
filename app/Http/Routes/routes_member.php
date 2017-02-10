@@ -55,5 +55,13 @@ Route::group(['prefix'=>'u','middleware' =>'MemberAuth','namespace'=>'Member'], 
 //渲染订单路由
 Route::group(['prefix'=>'o','middleware' =>'MemberAuth','namespace'=>'Member'], function(){
     Route::get('pro/{pro_id}/create', 'OrderController@create');
+    Route::resource('s/{cate}', 'OrderController@index');
     Route::resource('/', 'OrderController');
+});
+//用户账户路由
+Route::group(['prefix'=>'myinfo','middleware' =>'MemberAuth','namespace'=>'Member'], function(){
+    Route::get('wealbysign/{weal}', 'AccountController@getWealBySign');
+    Route::get('wealbygold/{weal}', 'AccountController@getWealByGold');
+    Route::get('wealbytip/{weal}', 'AccountController@getWealByTip');
+    Route::resource('/', 'AccountController');
 });

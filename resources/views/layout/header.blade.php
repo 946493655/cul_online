@@ -15,6 +15,7 @@
       </span>
       <span class="header_right">
         <div class="head_right">
+            <a href="{{DOMAIN}}help" target="_blank">帮助</a>
             <a href="{{env('TALK_DOMAIN')}}">话题论坛</a>
             <a href="{{env('WWW_DOMAIN')}}" target="_blank">主网站</a>
         </div>

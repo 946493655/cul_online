@@ -50,6 +50,27 @@ class ApiTempFrame
         );
     }
 
+    /**
+     * 通过 tl_id 对应模板关键帧获取当前关键帧
+     */
+    public static function getFrameByTFid($tf_id)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/t/frame/onebytfid';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, array(
+            'tf_id'    =>  $tf_id,
+        ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
+            'data' => ApiBase::objToArr($response->data),
+        );
+    }
+
     public static function add($data)
     {
         $apiUrl = ApiBase::getApiCurl() . '/api/v1/t/frame/add';

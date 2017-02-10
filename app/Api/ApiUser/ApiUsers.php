@@ -33,7 +33,7 @@ class ApiUsers
      */
     public static function getOneUser($uid)
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/user/show';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/user/oneuser';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(

@@ -29,7 +29,7 @@
             @if(count($datas))
                 @foreach($datas as $data)
             <tr>
-                <td>{{$data['uame']}}</td>
+                <td>{{$data['uname']}}</td>
                 <td>{{$data['pname']}}</td>
                 <td>{{$data['statusName']}}</td>
                 <td>@if($data['status']>3 && $data['thumb'])
