@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Member;
 
 use App\Api\ApiOnline\ApiProduct;
 use App\Api\ApiOnline\ApiProLayer;
+use App\Api\ApiOnline\ApiTempLayer;
 use Illuminate\Support\Facades\Request as AjaxRequest;
 use Illuminate\Support\Facades\Input;
 use Redis;

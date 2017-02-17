@@ -114,11 +114,11 @@ class Controller extends BaseController
                 echo "<script>alert('你的图片格式不对！');history.go(-1);</script>";exit;
             }
             $extension       = $file->getClientOriginalExtension() ?: 'png';
-            $folderName      = '/uploads/images/'.date('Y-m-d', time()).'/';
+            $folderName      = 'uploads/images/'.date('Y-m-d', time()).'/';
             $destinationPath = public_path().$folderName;
             $safeName        = uniqid().'.'.$extension;
             $file->move($destinationPath, $safeName);
-            $filePath = $folderName.$safeName;
+            $filePath = ltrim(DOMAIN,'/').$folderName.$safeName;
             return $filePath;
         } else {
             return "没有图片！";
