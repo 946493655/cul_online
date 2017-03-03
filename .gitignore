@@ -1,6 +1,12 @@
-vendor
+vendor/
 .env
 .idea/
 storage/
-tests/
+test/
+app/Api/ApiBusiness/ApiBase.php
+app/Api/ApiOnline/ApiBase.php
+app/Api/ApiTalk/ApiBase.php
+app/Api/ApiUser/ApiBase.php
+config/session.php
+>>>>>>> ff690702b6daf4dfe3717b5ba4841cc0b35be46b
 public/uploads/
