@@ -24,9 +24,14 @@ class HomeController extends BaseController
 
     public function index($cate=0)
     {
-        $pageCurr = isset($_POST['pageCurr'])?$_POST['pageCurr']:1;
-        $datas = $this->query($pageCurr,$cate);
-        $pagelist = $this->getPageList($datas,DOMAIN,$this->limit,$pageCurr);
+        $pageCurr = isset($_GET['pageCurr'])?$_GET['pageCurr']:1;
+        $apiProduct = ApiProduct::index($this->limit,$pageCurr,$this->userid,$cate,0);
+        if ($apiProduct['code']!=0) {
+            $datas = array(); $total = 0;
+        } else {
+            $datas = $apiProduct['data']; $total = $apiProduct['pagelist']['total'];
+        }
+        $pagelist = $this->getPageList($total,DOMAIN,$this->limit,$pageCurr);
         $result = [
             'datas' => $datas,
             'prefix_url' => DOMAIN,
@@ -294,12 +299,7 @@ class HomeController extends BaseController
 
 
 
-    public function query($pageCurr,$cate)
-    {
-        $rst = ApiProduct::index($this->limit,$pageCurr,$this->userid,$cate,0);
-        $datas = $rst['code']==0 ? $rst['data'] : [];
-        return $datas;
-    }
+
 
     /**
      * 获取 model

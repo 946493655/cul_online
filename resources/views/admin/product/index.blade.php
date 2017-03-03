@@ -7,7 +7,7 @@
             {{--@if(env('APP_ENV')=='local')--}}
                 {{--<a href="javascript:void(0);" onclick="getEditPro2()">清空表</a>--}}
             {{--@endif--}}
-            <a href="javascript:void(0);" onclick="getEditPro1()" title="新产品增加">+ 添加模板</a>
+            <a href="javascript:void(0);" onclick="getEditPro1()" title="新产品增加">+ 添加产品</a>
         </div>
         <div class="list">
             @if(count($datas))
@@ -54,8 +54,8 @@
             </p>
             <p>产品类型：
                 <select name="cate" required>
-                    @foreach($model['cates'] as $kcate=>$vcate)
-                        <option value="{{$kcate}}">{{$vcate}}</option>
+                    @foreach($model['cates'] as $k=>$vcate)
+                        <option value="{{$k}}">{{$vcate}}</option>
                     @endforeach
                 </select>
             </p>
@@ -65,7 +65,7 @@
             <p style="text-align:center">
                 <input type="submit" id="submit" title="点击确定更新" value="确定修改">
             </p>
-            <a href="javascript:void(0);" title="关闭" class="close" onclick="closeEditPro1()"> X </a>
+            <a href="javascript:void(0);" title="关闭" class="close" onclick="getClose()"> X </a>
         </form>
     </div>
     {{--弹出框：添加产品--}}
@@ -75,15 +75,14 @@
             <p style="text-align:center;">
                 确定要删除 模板列表 么？ <br><br>
                 <a href="{{DOMAIN}}admin/temp/clear">确定清空</a>
-                <a href="javascript:void(0);" onclick="closeEditPro2()">取消</a>
+                <a href="javascript:void(0);" onclick="getClose()">取消</a>
             </p>
         </div>
     </div>
 
     <script>
         function getEditPro1(){ $("#editproduct1").show(); }
-        function closeEditPro1(){ $("#editproduct1").hide(); }
         function getEditPro2(){ $("#editproduct2").show(); }
-        function closeEditPro2(){ $("#editproduct2").hide(); }
+        function getClose(){ $("#editproduct").hide(); }
     </script>
 @stop

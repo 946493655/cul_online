@@ -15,7 +15,7 @@ class ApiBase
     public static function getApiKey()
     {
 //        return env('API_KEY', '3TTN5JUf8uLcC3ZxIrszuO9isduc3IKO');
-        return '3TTN5JUf8uLcC3ZxIrszuO9isduc3IKO';
+        return 'PTsPhuEedHyvT9GOiph3PF3ftjISWjmh';
     }
 
     /**

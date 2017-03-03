@@ -24,10 +24,15 @@ class TempProController extends BaseController
 
     public function index($cate=0)
     {
-        $pageCurr = isset($_POST['pageCurr'])?$_POST['pageCurr']:1;
+        $pageCurr = isset($_GET['pageCurr'])?$_GET['pageCurr']:1;
         $prefix_url = DOMAIN.'admin/temp';
-        $datas = $this->query($pageCurr,$cate);
-        $pagelist = $this->getPageList($datas,$prefix_url,$this->limit,$pageCurr);
+        $apiTemp = ApiTempPro::index($this->limit,$pageCurr,$cate);
+        if ($apiTemp['code']!=0) {
+            $datas = array(); $total = 0;
+        } else {
+            $datas = $apiTemp['data']; $total = $apiTemp['pagelist']['total'];
+        }
+        $pagelist = $this->getPageList($total,$prefix_url,$this->limit,$pageCurr);
         $result = [
             'datas' => $datas,
             'pagelist' => $pagelist,
@@ -145,7 +150,7 @@ class TempProController extends BaseController
     /**
      * 设置 isshow
      */
-    public function setIsShow()
+    public function setShow()
     {
         if (AjaxRequest::ajax()) {
             $id = Input::get('id');
@@ -306,13 +311,6 @@ class TempProController extends BaseController
             'cate'  =>  $request->cate,
             'intro' =>  $request->intro,
         );
-    }
-
-    public function query($pageCurr,$cate)
-    {
-        $rst = ApiTempPro::index($this->limit,$pageCurr,$cate);
-        $datas = $rst['code']==0 ? $rst['data'] : [];
-        return $datas;
     }
 
     public function getModel()

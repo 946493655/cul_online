@@ -22,9 +22,9 @@ class TFrameController extends BaseController
      */
     public function index($tempid,$layerid)
     {
-        if (!$tempid || !$layerid) {
-            echo "<script>alert('参数错误！');history.go(-1);</script>";exit;
-        }
+//        if (!$tempid || !$layerid) {
+//            echo "<script>alert('参数错误！');history.go(-1);</script>";exit;
+//        }
         //先查看缓存中有没有关键帧数据
         $attr = 1;
         $rstRedis = Redis::get($this->keyRedis.$layerid);
@@ -43,27 +43,27 @@ class TFrameController extends BaseController
         }
         //没有，再查询数据表
         if (!isset($leftArr)) {
-            $apiFrameLefts = ApiTempFrame::index($tempid,$layerid,1);
+            $apiFrameLefts = ApiTempFrame::index($tempid,$layerid,$attr);
             $leftArr = $apiFrameLefts['code']==0 ? $apiFrameLefts['data'] : [];
             $layerArr['frame_left'] = $leftArr;
         }
         if (!isset($topArr)) {
-            $apiFrameTops = ApiTempFrame::index($tempid,$layerid,2);
+            $apiFrameTops = ApiTempFrame::index($tempid,$layerid,$attr);
             $topArr = $apiFrameTops['code']==0 ? $apiFrameTops['data'] : [];
             $layerArr['frame_top'] = $topArr;
         }
         if (!isset($opacityArr)) {
-            $apiFrameOpacitys = ApiTempFrame::index($tempid,$layerid,3);
+            $apiFrameOpacitys = ApiTempFrame::index($tempid,$layerid,$attr);
             $opacityArr = $apiFrameOpacitys['code']==0 ? $apiFrameOpacitys['data'] : [];
             $layerArr['frame_opacity'] = $opacityArr;
         }
         if (!isset($rotateArr)) {
-            $apiFrameRotates = ApiTempFrame::index($tempid,$layerid,4);
+            $apiFrameRotates = ApiTempFrame::index($tempid,$layerid,$attr);
             $rotateArr = $apiFrameRotates['code']==0 ? $apiFrameRotates['data'] : [];
             $layerArr['frame_rotate'] = $rotateArr;
         }
         if (!isset($scaleArr)) {
-            $apiFrameScales = ApiTempFrame::index($tempid,$layerid,5);
+            $apiFrameScales = ApiTempFrame::index($tempid,$layerid,$attr);
             $scaleArr = $apiFrameScales['code']==0 ? $apiFrameScales['data'] : [];
             $layerArr['frame_rotate'] = $scaleArr;
         }
@@ -91,6 +91,9 @@ class TFrameController extends BaseController
 
     public function store(Request $request,$tempid,$layerid)
     {
+        if (!$tempid || !$layerid) {
+            echo "<script>alert('暂无动画层！');history.go(-1);</script>";exit;
+        }
         $data = $this->getData($request);
         $apiKey = ApiTempFrame::add($data);
         if ($apiKey['code']!=0) {

@@ -6,27 +6,27 @@
         <table class="list">
             <tr>
                 <td><a href="javascript:;" style="color:lightgrey;"
-                       onclick="window.location.href='{{DOMAIN}}admin/temp/{{$temp['id']}}';">返回上一页</a>
+                       onclick="window.location.href='{{DOMAIN}}admin/product/{{$product['id']}}';">返回上一页</a>
                 </td>
-                <td>产品编号：{{$temp['serial']}}</td>
-                <td>产品名称：{{$temp['name']}}</td>
-                <td>产品类型：{{$temp['cateName']}}</td>
+                {{--<td>产品编号：{{$product['serial']}}</td>--}}
+                <td>产品名称：{{$product['name']}}</td>
+                <td>产品类型：{{$product['cateName']}}</td>
             </tr>
             <tr><td colspan="5" style="border:0;">
-                    <iframe id="modifytemp" width="985" height="450" frameborder=0 scrolling=no src="{{DOMAIN}}admin/t/{{$temp['id']}}/layer/{{$layerid}}"></iframe>
-                    <iframe id="modifylayer" width="984" height="120" frameborder=0 scrolling=no src="{{DOMAIN}}admin/t/{{$temp['id']}}/{{$layerid}}/frame"></iframe>
+                    <iframe id="modifytemp" width="985" height="450" frameborder=0 scrolling=no src="{{DOMAIN}}admin/pro/{{$product['id']}}/layer/{{$layerid}}"></iframe>
+                    <iframe id="modifylayer" width="984" height="120" frameborder=0 scrolling=no src="{{DOMAIN}}admin/pro/{{$product['id']}}/{{$layerid}}/frame"></iframe>
                     <div id="buttonmenu" style="top:715px;">
                         <p>
                             <span style="color:#4d4d4d;"><b>层面板：</b></span>
                             <a href="javascript:;" id="editbg" title="修改模板大背景"
-                                onclick="getEditBg()">模板背景</a>
+                                onclick="getEditBg()">产品背景</a>
                             <a href="javascript:;" id="addlayer" title="添加新的动画设置"
                                 onclick="getEditPro1()">添加动画</a>
                             <span style="float:right;">
-                                <a href="{{DOMAIN}}admin/temp/preview/{{$temp['id']}}" target="_blank"
+                                <a href="{{DOMAIN}}admin/temp/preview/{{$product['id']}}" target="_blank"
                                    title="预览整体动画效果">预览整体</a>
                                 &nbsp; | &nbsp;
-                                <a href="{{DOMAIN}}admin/t/{{$temp['id']}}/{{$layerid}}/prelayer"
+                                <a href="{{DOMAIN}}admin/t/{{$product['id']}}/{{$layerid}}/prelayer"
                                    title="预览当前片段[ {{$layerName}} ]"
                                    target="_blank" id="preCurrLayer">
                                     预览[{{str_limit($layerName,8)}}]</a> &nbsp;
@@ -56,11 +56,11 @@
     {{--弹出框：添加动画--}}
     <div class="editproduct" id="editproduct1">
         <div class="mask"></div>
-        <form action="{{DOMAIN}}admin/t/{{$temp['id']}}/layer" method="POST" data-am-validator>
+        <form action="{{DOMAIN}}admin/t/{{$product['id']}}/layer" method="POST" data-am-validator>
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="_method" value="POST">
-            <input type="hidden" name="tempid" value="{{$temp['id']}}">
-            <p style="text-align:center"><b>{{$temp['name']}} 添加动画</b></p>
+            <input type="hidden" name="tempid" value="{{$product['id']}}">
+            <p style="text-align:center"><b>{{$product['name']}} 添加动画</b></p>
             <p>动画片段名：
                 <input type="text" minlength="2" maxlength="20" required name="name">
             </p>
@@ -79,26 +79,26 @@
     {{--弹出框：修改模板总背景--}}
     <div class="editproduct" id="editproduct2">
         <div class="mask"></div>
-        <form action="{{DOMAIN}}admin/temp/bg/{{$temp['id']}}" method="POST" data-am-validator enctype="multipart/form-data">
+        <form action="{{DOMAIN}}admin/temp/bg/{{$product['id']}}" method="POST" data-am-validator enctype="multipart/form-data">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="_method" value="POST">
-            <input type="hidden" name="tempid" value="{{$temp['id']}}">
-            <p style="text-align:center"><b>{{$temp['name']}} 修改背景</b></p>
+            <input type="hidden" name="tempid" value="{{$product['id']}}">
+            <p style="text-align:center"><b>{{$product['name']}} 修改背景</b></p>
             <p>类型选择：
                 <select name="isbg" onchange="setBg(this.value)">
-                    <option value="0" {{(!$tempAttrArr||$tempAttrArr['isbg']==0) ? 'selected ': ''}}>默认背景色</option>
-                    <option value="1" {{($tempAttrArr&&$tempAttrArr['isbg']==1) ? 'selected ': ''}}>颜色更新</option>
-                    <option value="2" {{($tempAttrArr&&$tempAttrArr['isbg']==2) ? 'selected ': ''}}>图片更新</option>
+                    <option value="0" {{(!$proAttrArr||$proAttrArr['isbg']==0) ? 'selected ': ''}}>默认背景色</option>
+                    <option value="1" {{($proAttrArr&&$proAttrArr['isbg']==1) ? 'selected ': ''}}>颜色更新</option>
+                    <option value="2" {{($proAttrArr&&$proAttrArr['isbg']==2) ? 'selected ': ''}}>图片更新</option>
                 </select>
             </p>
-            <p id="selcolor" style="display:{{($tempAttrArr&&$tempAttrArr['isbg']==1) ? 'block' : 'none'}};">
+            <p id="selcolor" style="display:{{($proAttrArr&&$proAttrArr['isbg']==1) ? 'block' : 'none'}};">
                 选择颜色：
                 <input type="color" name="bgcolor" title="点击选择颜色" style="padding:0;height:40px;cursor:pointer;"
-                       value="{{($tempAttrArr&&$tempAttrArr['bgcolor']) ? $tempAttrArr['bgcolor'] : '#9a9a9a'}}">
+                       value="{{($proAttrArr&&$proAttrArr['bgcolor']) ? $proAttrArr['bgcolor'] : '#9a9a9a'}}">
             </p>
-            <p id="selimg" style="display:{{($tempAttrArr&&$tempAttrArr['isbg']==2) ? 'block' : 'none'}};">
-                @if($tempAttrArr&&$tempAttrArr['bgimg'])
-                    <img src="{{$tempAttrArr['bgimg']}}" width="300" height="150px"><br>
+            <p id="selimg" style="display:{{($proAttrArr&&$proAttrArr['isbg']==2) ? 'block' : 'none'}};">
+                @if($proAttrArr&&$proAttrArr['bgimg'])
+                    <img src="{{$proAttrArr['bgimg']}}" width="300" height="150px"><br>
                     重新
                 @endif
                 选择图片：<br>
@@ -122,9 +122,9 @@
         function getLayer(layerid){
             var layerId0 = $("input[name='layerId0']").val();
             if (layerId0==layerid) {
-                window.location.href = '{{DOMAIN}}admin/t/{{$temp['id']}}/layer';
+                window.location.href = '{{DOMAIN}}admin/t/{{$product['id']}}/layer';
             } else {
-                window.location.href = '{{DOMAIN}}admin/t/{{$temp['id']}}/'+layerid+'/layer';
+                window.location.href = '{{DOMAIN}}admin/t/{{$product['id']}}/'+layerid+'/layer';
             }
         }
         function getEditPro1(){ $("#editproduct1").show(); }

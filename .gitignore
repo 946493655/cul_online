@@ -1,4 +1,6 @@
-/vendor
+vendor
 .env
 .idea/
-/public/uploads/*
+storage/
+tests/
+public/uploads/

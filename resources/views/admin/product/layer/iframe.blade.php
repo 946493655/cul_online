@@ -1,7 +1,7 @@
 <style>
     body { margin:0;padding:0;font-family:'微软雅黑'; }
     /*===div的滚动条修改===*/
-    #menu { margin-top:5px;padding:5px;padding-bottom:20px;width:175px;height:450px;color:grey;background:black;
+    #menu { margin-top:5px;padding:2px;padding-bottom:20px;width:175px;height:450px;color:grey;background:black;
         border-left:1px solid grey;overflow:scroll;position:absolute;top:-10px;left:800px; }
     /*#menu ::-webkit-scrollbar-corner { background:transparent; }*/
     #menu::-webkit-scrollbar { width:5px; }
@@ -20,7 +20,7 @@
     #menu a:hover { color:orangered; }
     #menu .menutab { padding:5px;padding-left:10px;color:grey;display:none; }
     #menu .menutab p { margin:0;padding:0; }
-    #menu input,#menu select { margin:2px 0;padding:2px 5px;width:30px;border:0;color:orangered;font-size:16px;background:#333; }
+    #menu input,#menu select { margin:2px 0;padding:2px;width:25px;border:0;color:orangered;font-size:16px;background:#333; }
     #menu select { width:70px; }
     #menu input.radio { margin:0;padding:0;width:10px; }
     #menu textarea { margin:5px 0;padding:5px;width:140px;height:100px;border:1px solid #333;border-radius:3px;color:orangered;background:#333;resize:none; }
@@ -32,8 +32,8 @@
     /*动画窗口*/
     #tempbg {
         width:800px; height:450px;overflow:hidden;
-        @if(!isset($tempAttrArr['isbg'])||(isset($tempAttrArr['isbg'])&&!$tempAttrArr['isbg'])){{'background:#9a9a9a;'}}
-        @elseif(isset($tempAttrArr['isbg'])&&$tempAttrArr['isbg']==1){{'background:'.$tempAttrArr['bgcolor'].';'}}
+        @if(!isset($proAttrArr['isbg'])||(isset($proAttrArr['isbg'])&&!$proAttrArr['isbg'])){{'background:#9a9a9a;'}}
+        @elseif(isset($proAttrArr['isbg'])&&$proAttrArr['isbg']==1){{'background:'.$proAttrArr['bgcolor'].';'}}
         @endif
     }
     #iframe {
@@ -66,8 +66,8 @@
 
 {{--动画窗口--}}
 <div id="tempbg">{{--模板大背景--}}
-    @if(isset($tempAttrArr['isbg'])&&$tempAttrArr['isbg']==2)
-        <img src="{{$tempAttrArr['bgimg']}}">
+    @if(isset($proAttrArr['isbg'])&&$proAttrArr['isbg']==2)
+        <img src="{{$proAttrArr['bgimg']}}">
     @endif
 </div>
 <div id="iframe">
@@ -170,10 +170,10 @@
                 <textarea name="text" id="text" onchange="setText()">{{(isset($cons['iscon'])&&$cons['iscon']==1&&$cons['text'])?$cons['text']:'文字待输入...'}}</textarea>
             </span>
 
-            <form action="{{DOMAIN}}admin/t/{{$temp['id']}}/layer/toimg/{{$layers['id']}}" method="POST" data-am-validator enctype="multipart/form-data" id="isimg" style="display:none;">
+            <form action="{{DOMAIN}}admin/t/{{$product['id']}}/layer/toimg/{{$layers['id']}}" method="POST" data-am-validator enctype="multipart/form-data" id="isimg" style="display:none;">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="_method" value="POST">
-                <input type="hidden" name="tempid" value="{{$temp['id']}}">
+                <input type="hidden" name="pro_id" value="{{$product['id']}}">
                 <input type="hidden" name="layerid" value="{{$layers['id']}}">
                 <script src="{{PUB}}assets/js/local_pre.js"></script>
                 <input type="button" class="submit" value="[ 找图 ]" onclick="path.click()" style="width:90px;cursor:pointer;"><br>
@@ -186,11 +186,11 @@
         </div>
     </div>
     <div style="height:50px;"></div>
-    @if($hasRedis)
-    <div id="submit">
-        <a href="javascript:;" title="点击取消修改" class="submit" onclick="cancel()">取消修改</a><a href="javascript:;" title="点击确定修改" class="submit" onclick="save()">确定修改</a>
-    </div>
-    @endif
+    {{--@if($hasRedis)--}}
+    {{--<div id="submit">--}}
+        {{--<a href="javascript:;" title="点击取消修改" class="submit" onclick="cancel()">取消修改</a><a href="javascript:;" title="点击确定修改" class="submit" onclick="save()">确定修改</a>--}}
+    {{--</div>--}}
+    {{--@endif--}}
 @else
     <div class="menu"><a href="javascript:;">待添加...</a></div>
 @endif
@@ -271,14 +271,14 @@
 
     $.ajaxSetup({headers : {'X-CSRF-TOKEN':$('input[name="_token"]').val()}});
     var layerid = $("input[name='layerid']").val();
-    var tempid = $("input[name='tempid']").val();
+    var pro_id = $("input[name='pro_id']").val();
     //ajax更新动画设置数据
     function setLayer(){
         var name = $("input[name='name']").val();
         var delay = $("input[name='delay']").val();
         var timelong = $("input[name='timelong']").val();
         var data = {
-            'tempid':tempid,
+            'pro_id':pro_id,
             'layerid':layerid,
             'name':name,
             'delay':delay,
@@ -286,7 +286,7 @@
         };
         $.ajax({
             type: 'POST',
-            url: '/admin/t/'+tempid+'/layer/tolayer',
+            url: '/admin/pro/'+pro_id+'/layer/tolayer',
             data: data,
             dataType: 'json',
             success: function(data) {
@@ -313,7 +313,7 @@
         var isbigbg = $("input[name='isbigbg']").val();
         var bigbg = $("input[name='bigbg']").val();
         var data = {
-            'tempid':tempid,
+            'pro_id':pro_id,
             'layerid':layerid,
             'width':width,
             'height':height,
@@ -331,7 +331,7 @@
         };
         $.ajax({
             type: 'POST',
-            url: '/admin/t/'+tempid+'/layer/toattr',
+            url: '/admin/pro/'+pro_id+'/layer/toattr',
             data: data,
             dataType: 'json',
             success: function(data) {
@@ -347,14 +347,14 @@
         var iscon = $("input[name='iscon']").val();
         var text = $("textarea[name='text']").val();
         var data = {
-            'tempid':tempid,
+            'pro_id':pro_id,
             'layerid':layerid,
             'iscon':iscon,
             'text':text
         };
         $.ajax({
             type: 'POST',
-            url: '/admin/t/'+tempid+'/layer/totext',
+            url: '/admin/pro/'+pro_id+'/layer/totext',
             data: data,
             dataType: 'json',
             success: function(data) {
@@ -367,10 +367,10 @@
     }
     //取消、删除几个缓存
     function cancel(){
-        window.location.href = '{{DOMAIN}}admin/t/'+tempid+'/layer/cancel/'+layerid;
+        window.location.href = '{{DOMAIN}}admin/pro/'+pro_id+'/layer/cancel/'+layerid;
     }
     //缓存入库
     function save(){
-        window.location.href = '{{DOMAIN}}admin/t/'+tempid+'/layer/save/'+layerid;
+        window.location.href = '{{DOMAIN}}admin/pro/'+pro_id+'/layer/save/'+layerid;
     }
 </script>

@@ -28,7 +28,7 @@ Route::group(['prefix'=>'admin','middleware' =>'AdminAuth','namespace'=>'Admin']
         Route::get('layer/{layerid}', 'TLayerController@show');
         Route::post('layer/tolayer', 'TLayerController@setLayer');
         Route::post('layer/toattr', 'TLayerController@setAttr');
-        Route::post('layer/totext', 'TLayerController@settext');
+        Route::post('layer/totext', 'TLayerController@setText');
         Route::post('layer/toimg/{layerid}', 'TLayerController@setImg');
         Route::get('layer/cancel/{layerid}', 'TLayerController@delRedis');
         Route::get('layer/save/{layerid}', 'TLayerController@saveRedisToDB');
@@ -51,4 +51,15 @@ Route::group(['prefix'=>'admin','middleware' =>'AdminAuth','namespace'=>'Admin']
     });
     //用户产品路由
     Route::resource('product', 'ProductController');
+    Route::group(['prefix'=>'pro/{pro_id}'], function(){
+        Route::get('layer/{layerid}', 'ProLayerController@show');
+        Route::post('layer/tolayer', 'ProLayerController@setLayer');
+        Route::post('layer/toattr', 'ProLayerController@setAttr');
+        Route::post('layer/totext', 'ProLayerController@setText');
+        Route::post('layer/toimg/{layerid}', 'ProLayerController@setImg');
+        Route::resource('layer', 'ProLayerController');
+    });
+    Route::group(['prefix'=>'pro/{pro_id}/{layerid}'], function(){
+        Route::resource('frame', 'ProFrameController');
+    });
 });

@@ -25,20 +25,23 @@ class TLayerController extends BaseController
         }
         $tempAttrArr = $rstTemp['data']['attr'] ? unserialize($rstTemp['data']['attr']) : [];
         $rst = ApiTempLayer::index($tempid);
-        if ($rst['code']!=0) {
-            echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
-        }
+//        if ($rst['code']!=0) {
+//            echo "<script>alert('".$rst['msg']."');history.go(-1);</script>";exit;
+//        }
         //当前操作的动画层
-        $layerid = $layerid ? $layerid : $rst['data'][0]['id'];
-        $rstLayer = ApiTempLayer::show($layerid);
-        if ($rstLayer['code']!=0) {
-            echo "<script>alert('".$rstLayer['msg']."');history.go(-1);</script>";exit;
+//        $layerid = $layerid ? $layerid : $rst['data'][0]['id'];
+        if (!$layerid) {
+            $layerid = $rst['code']==0 ? $rst['data'][0]['id'] : 0;
         }
+        $rstLayer = ApiTempLayer::show($layerid);
+//        if ($rstLayer['code']!=0) {
+//            echo "<script>alert('".$rstLayer['msg']."');history.go(-1);</script>";exit;
+//        }
         $result = [
             'temp' => $rstTemp['data'],
-            'datas' => $rst['data'],
+            'datas' => $rst['code']==0 ? $rst['data'] : [],
             'layerid' => $layerid,
-            'layerName' => $rstLayer['data']['name'],
+            'layerName' => $rstLayer['code']==0 ? $rstLayer['data']['name'] : '',
             'tempAttrArr' => $tempAttrArr,
         ];
         return view('admin.layer.index',$result);
@@ -78,9 +81,9 @@ class TLayerController extends BaseController
         if ($rstTemp['data']['attr']) { $tempAttrArr = unserialize($rstTemp['data']['attr']); }
         //动画属性：先读缓存，再读数据表记录
         $rstLayer = ApiTempLayer::show($id);
-        if ($rstLayer['code']!=0) {
-            echo "<script>alert('".$rstLayer['msg']."');history.go(-1);</script>";exit;
-        }
+//        if ($rstLayer['code']!=0) {
+//            echo "<script>alert('".$rstLayer['msg']."');history.go(-1);</script>";exit;
+//        }
         if ($rstRedis=Redis::get($this->rediskey.$id)) {
             $layerArr = unserialize($rstRedis);
             $layers = isset($layerArr['layer'])?$layerArr['layer']:[];
@@ -90,26 +93,32 @@ class TLayerController extends BaseController
             $hasRedis = ($layers||$attrs||$cons) ? 1 : 0;      //判断是否有缓存
         }
         //动画、属性、内容，没有的话去接口获取
-        $apilayer = $rstLayer['data'];
-        if (!isset($layers) || (isset($layers)&&!$layers)) {
-            $layers = [
-                'id' => $apilayer['id'],
-                'name' => $apilayer['name'],
-                'delay' => $apilayer['delay'],
-                'timelong' => $apilayer['timelong'],
-                'isshow' => $apilayer['isshow'],
-            ];
-        }
-        if ((!isset($attrs) || (isset($attrs)&&!$attrs)) && $apilayer['attr']) {
-            $attrs = $apilayer['attr'] ? unserialize($apilayer['attr']) : [];
-        }
-        if ((!isset($cons) || (isset($cons)&&!$cons)) && $apilayer['con']) {
-            $conArr = $apilayer['con'] ? unserialize($apilayer['con']) : [];
-            $cons = [
-                'iscon' =>  $conArr['iscon'],
-                'text'  =>  $conArr['text'],
-                'img'   =>  $conArr['img'],
-            ];
+        $apilayer = $rstLayer['code']==0 ? $rstLayer['data']: [];
+        if ($apilayer) {
+            if (!isset($layers) || (isset($layers)&&!$layers)) {
+                $layers = [
+                    'id' => $apilayer['id'],
+                    'name' => $apilayer['name'],
+                    'delay' => $apilayer['delay'],
+                    'timelong' => $apilayer['timelong'],
+                    'isshow' => $apilayer['isshow'],
+                ];
+            }
+            if ((!isset($attrs) || (isset($attrs)&&!$attrs)) && $apilayer['attr']) {
+                $attrs = $apilayer['attr'] ? unserialize($apilayer['attr']) : [];
+            }
+            if ((!isset($cons) || (isset($cons)&&!$cons)) && $apilayer['con']) {
+                $conArr = $apilayer['con'] ? unserialize($apilayer['con']) : [];
+                $cons = [
+                    'iscon' =>  $conArr['iscon'],
+                    'text'  =>  $conArr['text'],
+                    'img'   =>  $conArr['img'],
+                ];
+            }
+        } else {
+            $layers = array();
+            $attrs = array();
+            $cons = array();
         }
         $result = [
             'temp' => $rstTemp['data'],

@@ -33,6 +33,7 @@ class ApiTempPro
         return array(
             'code' => 0,
             'data' => ApiBase::objToArr($response->data),
+            'pagelist' => ApiBase::objToArr($response->pagelist),
         );
     }
 
@@ -180,7 +181,7 @@ class ApiTempPro
      */
     public static function setShow($id,$isshow)
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/isshow';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/temp/setshow';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(
