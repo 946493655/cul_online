@@ -13,6 +13,8 @@ class ProLayerController extends BaseController
      * 后台产品动画层
      */
 
+    protected $keyRedis = 'online_admin_pro_layer_';
+
     public function index($pro_id,$layerid=0)
     {
         $apiProduct = ApiProduct::show($pro_id);
@@ -56,9 +58,9 @@ class ProLayerController extends BaseController
             $attrs = $apilayer['attr'] ? unserialize($apilayer['attr']) : [];
             $conArr = $apilayer['con'] ? unserialize($apilayer['con']) : [];
             $cons = [
-                'iscon' =>  $conArr ? $conArr['iscon'] : [],
-                'text'  =>  $conArr ? $conArr['text'] : [],
-                'img'   =>  $conArr ? $conArr['img'] : [],
+                'iscon' =>  $conArr ? $conArr['iscon'] : 1,
+                'text'  =>  $conArr ? $conArr['text'] : '',
+                'img'   =>  $conArr ? $conArr['img'] : '',
             ];
         }
         $result = [
@@ -120,6 +122,29 @@ class ProLayerController extends BaseController
      */
     public function setAttr(Request $request)
     {
+        if (AjaxRequest::ajax()) {
+            $id = $request->layerid;
+            $data = [
+                'width' =>  $request->width,
+                'height'    =>  $request->height,
+                'isborder'  =>  $request->isborder,
+                'border1'   =>  $request->border1,
+                'border2'   =>  $request->border2,
+                'border3'   =>  $request->border3,
+                'isbg'      =>  $request->isbg,
+                'bg'        =>  $request->bg,
+                'iscolor'   =>  $request->iscolor,
+                'color'     =>  $request->color,
+                'fontsize'  =>  $request->fontsize,
+                'isbigbg'   =>  $request->isbigbg,
+                'bigbg'     =>  $request->bigbg,
+            ];
+            if (!$this->saveToDB($id,array(),$data,'','')) {
+                echo json_encode(array('code'=>-3, 'msg'=>'操作失败！'));exit;
+            }
+            echo json_encode(array('code'=>0, 'msg'=>'操作成功！'));exit;
+        }
+        echo json_encode(array('code'=>-2, 'msg'=>'参数错误！'));exit;
     }
 
     /**
@@ -127,6 +152,22 @@ class ProLayerController extends BaseController
      */
     public function setText(Request $request)
     {
+        if (AjaxRequest::ajax()) {
+            $id = $request->layerid;
+            if (!$request->text) {
+                echo json_encode(array('code'=>-1, 'msg'=>'文字未填！'));exit;
+            }
+            $data = [
+                'iscon' =>  $request->iscon,
+                'text'  =>  $request->text,
+                'img'   =>  '',
+            ];
+            if (!$this->saveToDB($id,array(),array(),$data)) {
+                echo json_encode(array('code'=>-3, 'msg'=>'操作失败！'));exit;
+            }
+            echo json_encode(array('code'=>0, 'msg'=>'操作成功！'));exit;
+        }
+        echo json_encode(array('code'=>-2, 'msg'=>'参数错误！'));exit;
     }
 
     /**
@@ -139,18 +180,21 @@ class ProLayerController extends BaseController
     /**
      * 动画数据入库
      */
-    public function saveToDB($id,$layers=array(),$attrs=array(),$text='',$img='')
+    public function saveToDB($id,$layers=array(),$attrs=array(),$cons=array())
     {
-        if (!$id && !$layers && !$attrs && !$text && !$img) { return false; }
+        if (!$id && !$layers && !$attrs && !$cons) { return false; }
         $apiProLayer = ApiProLayer::show($id);
-        $apiProduct = ApiProduct::show($apiProLayer['data']['pro_id']);
         if (!$attrs) {
             $attrs = $apiProLayer['data']['attr'] ? unserialize($apiProLayer['data']['attr']) : [];
         }
-        if ($text) { $iscon = 1; } else if ($img) { $iscon = 2; }
+        $conArr = $apiProLayer['data']['con'] ? unserialize($apiProLayer['data']['con']) : [];
+        if (isset($cons['text'])) {
+            $cons['img'] = $conArr ? $conArr['img'] : '';
+        } else if (isset($cons['img'])) {
+            $cons['text'] = $conArr ? $conArr['text'] : '';
+        }
         $data = [
             'id'        =>  $id,
-            'uid'       =>  $apiProduct['data']['uid'],
             'name'      =>  $layers ? $layers['name'] : $apiProLayer['data']['name'],
             'delay'     =>  $layers ? $layers['delay'] : $apiProLayer['data']['delay'],
             'timelong'  =>  $layers ? $layers['timelong'] : $apiProLayer['data']['timelong'],
@@ -167,13 +211,13 @@ class ProLayerController extends BaseController
             'fontsize'  =>  $attrs ? $attrs['fontsize'] : 16,
             'isbigbg'   =>  $attrs ? $attrs['isbigbg'] : 0,
             'bigbg'     =>  $attrs ? $attrs['bigbg'] : '#9a9a9a',
-            'iscon'     =>  isset($iscon) ? $iscon : 1,
-            'text'      =>  $text,
-            'img'       =>  $img,
+            'iscon'     =>  $cons ? $cons['iscon'] : 1,
+            'text'      =>  $cons ? $cons['text'] : '',
+            'img'       =>  $cons ? $cons['img'] : '',
         ];
-        $apiProLayer = ApiProLayer::modify($data);
-        if ($apiProLayer['code']!=0) {
-            echo "<script>alert('".$apiProLayer['msg']."');history.go(-1);</script>";exit;
+        $apiProLayer2 = ApiProLayer::modify($data);
+        if ($apiProLayer2['code']!=0) {
+            echo "<script>alert('".$apiProLayer2['msg']."');history.go(-1);</script>";exit;
         }
         return redirect(DOMAIN.'admin/pro/'.$apiProLayer['data']['pro_id'].'/layer');
     }

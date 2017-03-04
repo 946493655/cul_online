@@ -72,11 +72,11 @@
 </div>
 <div id="iframe">
 @if(!$layers)
-    <div id="attr_default">没有记录...</div>
+    <div id="{{$attrs?'attr':'attr_default'}}">没有记录...</div>
 @else
     <div id="{{$attrs?'attr':'attr_default'}}">
-        @if($cons && $cons['iscon']==1) {{$cons['text']}}
-        @elseif($cons && $cons['iscon']==2) <img src="{{$cons['img']}}">
+        @if($cons['text'] && $cons['iscon']==1) {{$cons['text']}}
+        @elseif($cons['img'] && $cons['iscon']==2) <img src="{{$cons['img']}}">
         @else 文字待输入...
         @endif
     </div>
@@ -162,7 +162,7 @@
     </div>
     <div class="menu"><a href="javascript:;" title="点击切换" onclick="getMenu(3);">内容：</a>
         <div class="menutab" id="menu3" style="display:{{(isset($menutab)&&$menutab==3)?'block':'none'}};">
-            <label><input type="radio" class="radio" name="iscon1" value="1" {{((isset($cons['iscon'])&&$cons['iscon']==1)||!isset($cons['iscon']))?'checked':''}} onclick="getCon(1)"> 文字 </label>
+            <label><input type="radio" class="radio" name="iscon1" value="1" {{(!isset($cons['iscon'])||(isset($cons['iscon'])&&$cons['iscon']==1))?'checked':''}} onclick="getCon(1)"> 文字 </label>
             <label><input type="radio" class="radio" name="iscon2" value="2" {{(isset($cons['iscon'])&&$cons['iscon']==2)?'checked':''}} onclick="getCon(2)"> 图片 </label>
             <input type="hidden" name="iscon" value="{{(isset($cons['iscon'])&&$cons['iscon']==2)?$cons['iscon']:1}}">
 
@@ -208,7 +208,7 @@
             $("#menu2").show(t);
         } else if (tab==3) {
             $("#menu3").show(t);
-            setText();
+//            setText();
         } else if (tab==4) {
             $("#menu4").show(t);
         }
@@ -262,7 +262,7 @@
         if (tab==1) {
             $("#istext").show();
             $("#isimg").hide();
-            setText();
+//            setText();
         } else {
             $("#istext").hide();
             $("#isimg").show();

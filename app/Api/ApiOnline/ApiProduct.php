@@ -184,15 +184,34 @@ class ApiProduct
     /**
      * 根据 uid、id 设置是否显示
      */
-    public static function setIsShow($uid,$id)
+    public static function setShow($id,$isshow)
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/isshow';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/setshow';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(
-            'uid'   =>  $uid,
-            'id' =>  $id,
+            'id'    =>  $id,
+            'isshow'    =>  $isshow,
         ));
+        $response = json_decode($curl->response);
+        if ($response->error->code != 0) {
+            return array('code' => -1, 'msg' => $response->error->msg);
+        }
+        return array(
+            'code' => 0,
+            'msg' => $response->error->msg,
+        );
+    }
+
+    /**
+     * 设置产品背景
+     */
+    public static function setAttr($data)
+    {
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/product/setattr';
+        $curl = new Curl();
+        $curl->setHeader('X-Authorization', ApiBase::getApiKey());
+        $curl->post($apiUrl, $data);
         $response = json_decode($curl->response);
         if ($response->error->code != 0) {
             return array('code' => -1, 'msg' => $response->error->msg);

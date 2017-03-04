@@ -50,6 +50,11 @@ Route::group(['prefix'=>'admin','middleware' =>'AdminAuth','namespace'=>'Admin']
         Route::get('keyvals', 'TFrameController@getKeyVals');
     });
     //用户产品路由
+    Route::post('product/{id}', 'ProductController@update');
+    Route::post('product/thumb/{pro_id}', 'ProductController@setThumb');
+    Route::post('product/link/{pro_id}', 'ProductController@setLink');
+    Route::post('product/getshow/{pro_id}', 'ProductController@setShow');
+    Route::post('product/bg/{pro_id}', 'ProductController@setProBg');
     Route::resource('product', 'ProductController');
     Route::group(['prefix'=>'pro/{pro_id}'], function(){
         Route::get('layer/{layerid}', 'ProLayerController@show');

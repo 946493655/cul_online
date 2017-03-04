@@ -15,7 +15,7 @@ class TLayerController extends BaseController
      * 动画修改
      */
 
-    protected $rediskey = 'online_admin_layer_';
+    protected $rediskey = 'online_admin_temp_layer_';
 
     public function index($tempid,$layerid=0)
     {

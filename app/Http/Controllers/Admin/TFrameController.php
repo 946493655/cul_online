@@ -15,7 +15,7 @@ class TFrameController extends BaseController
      * 关键帧
      */
 
-    protected $keyRedis = 'online_admin_layer_';
+    protected $keyRedis = 'online_admin_temp_layer_';
 
     /**
      * 通过 id 获取关键帧模板

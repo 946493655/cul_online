@@ -8,7 +8,6 @@
                 <td><a href="javascript:;" style="color:lightgrey;"
                        onclick="window.location.href='{{DOMAIN}}admin/product/{{$product['id']}}';">返回上一页</a>
                 </td>
-                {{--<td>产品编号：{{$product['serial']}}</td>--}}
                 <td>产品名称：{{$product['name']}}</td>
                 <td>产品类型：{{$product['cateName']}}</td>
             </tr>
@@ -23,10 +22,10 @@
                             <a href="javascript:;" id="addlayer" title="添加新的动画设置"
                                 onclick="getEditPro1()">添加动画</a>
                             <span style="float:right;">
-                                <a href="{{DOMAIN}}admin/temp/preview/{{$product['id']}}" target="_blank"
+                                <a href="{{DOMAIN}}admin/pro/preview/{{$product['id']}}" target="_blank"
                                    title="预览整体动画效果">预览整体</a>
                                 &nbsp; | &nbsp;
-                                <a href="{{DOMAIN}}admin/t/{{$product['id']}}/{{$layerid}}/prelayer"
+                                <a href="{{DOMAIN}}admin/pro/{{$product['id']}}/{{$layerid}}/prelayer"
                                    title="预览当前片段[ {{$layerName}} ]"
                                    target="_blank" id="preCurrLayer">
                                     预览[{{str_limit($layerName,8)}}]</a> &nbsp;
@@ -56,10 +55,10 @@
     {{--弹出框：添加动画--}}
     <div class="editproduct" id="editproduct1">
         <div class="mask"></div>
-        <form action="{{DOMAIN}}admin/t/{{$product['id']}}/layer" method="POST" data-am-validator>
+        <form action="{{DOMAIN}}admin/pro/{{$product['id']}}/layer" method="POST" data-am-validator>
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="_method" value="POST">
-            <input type="hidden" name="tempid" value="{{$product['id']}}">
+            <input type="hidden" name="pro_id" value="{{$product['id']}}">
             <p style="text-align:center"><b>{{$product['name']}} 添加动画</b></p>
             <p>动画片段名：
                 <input type="text" minlength="2" maxlength="20" required name="name">
@@ -79,10 +78,10 @@
     {{--弹出框：修改模板总背景--}}
     <div class="editproduct" id="editproduct2">
         <div class="mask"></div>
-        <form action="{{DOMAIN}}admin/temp/bg/{{$product['id']}}" method="POST" data-am-validator enctype="multipart/form-data">
+        <form action="{{DOMAIN}}admin/product/bg/{{$product['id']}}" method="POST" data-am-validator enctype="multipart/form-data">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="_method" value="POST">
-            <input type="hidden" name="tempid" value="{{$product['id']}}">
+            <input type="hidden" name="pro_id" value="{{$product['id']}}">
             <p style="text-align:center"><b>{{$product['name']}} 修改背景</b></p>
             <p>类型选择：
                 <select name="isbg" onchange="setBg(this.value)">
@@ -122,9 +121,9 @@
         function getLayer(layerid){
             var layerId0 = $("input[name='layerId0']").val();
             if (layerId0==layerid) {
-                window.location.href = '{{DOMAIN}}admin/t/{{$product['id']}}/layer';
+                window.location.href = '{{DOMAIN}}admin/pro/{{$product['id']}}/layer';
             } else {
-                window.location.href = '{{DOMAIN}}admin/t/{{$product['id']}}/'+layerid+'/layer';
+                window.location.href = '{{DOMAIN}}admin/pro/{{$product['id']}}/'+layerid+'/layer';
             }
         }
         function getEditPro1(){ $("#editproduct1").show(); }

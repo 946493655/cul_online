@@ -10,6 +10,8 @@ class ProFrameController extends BaseController
      * 后台产品关键帧
      */
 
+    protected $keyRedis = 'online_admin_pro_layer_';
+
     public function index($pro_id,$layerid)
     {
         $attr = 1;

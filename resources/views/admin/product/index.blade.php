@@ -12,7 +12,7 @@
         <div class="list">
             @if(count($datas))
                 @foreach($datas as $kdata=>$data)
-            <a href="{{DOMAIN}}admin/temp/{{$data['id']}}" title="点击进入调整 {{$data['name']}}">
+            <a href="{{DOMAIN}}admin/product/{{$data['id']}}" title="点击进入调整 {{$data['name']}}">
                 <div class="prolist">
                     <div class="pro_one">
                         @if($data['thumb'])
@@ -28,7 +28,7 @@
             </a>
                 @endforeach
             @endif
-            @for($i=0;$i<$pagelist['limit']+1-count($datas);++$i)
+            @for($i=0;$i<$pagelist['limit']-count($datas);++$i)
             <a href="javascript:void(0);">
                 <div class="prolist">
                     <div class="pro_one">+待添加</div>
@@ -45,22 +45,32 @@
     {{--弹出框：添加产品--}}
     <div class="editproduct" id="editproduct1">
         <div class="mask"></div>
-        <form action="{{DOMAIN}}admin/temp" method="POST" data-am-validator>
+        <form action="{{DOMAIN}}admin/product" method="POST" data-am-validator>
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="_method" value="POST">
             <p style="text-align:center"><b>产品添加</b></p>
             <p>产品名称：
                 <input type="text" placeholder="产品名称" minlength="2" maxlength="20" required name="name">
             </p>
-            <p>产品类型：
-                <select name="cate" required>
-                    @foreach($model['cates'] as $k=>$vcate)
-                        <option value="{{$k}}">{{$vcate}}</option>
+            <p>选择模板：
+                <select name="tempid" required>
+                    @foreach($temps as $temp)
+                        <option value="{{$temp['id']}}">{{$temp['name']}}</option>
                     @endforeach
                 </select>
             </p>
+            {{--<p>产品类型：--}}
+                {{--<select name="cate" required>--}}
+                    {{--@foreach($model['cates'] as $k=>$vcate)--}}
+                        {{--<option value="{{$k}}">{{$vcate}}</option>--}}
+                    {{--@endforeach--}}
+                {{--</select>--}}
+            {{--</p>--}}
             <p>产品介绍：
                 <textarea rows="5" placeholder="说明文字" style="resize:none;" name="intro"></textarea>
+            </p>
+            <p>用户名称：
+                <input type="text" placeholder="用户名称" minlength="2" maxlength="20" required name="uname">
             </p>
             <p style="text-align:center">
                 <input type="submit" id="submit" title="点击确定更新" value="确定修改">
@@ -68,21 +78,21 @@
             <a href="javascript:void(0);" title="关闭" class="close" onclick="getClose()"> X </a>
         </form>
     </div>
-    {{--弹出框：添加产品--}}
-    <div class="editproduct" id="editproduct2">
-        <div class="mask"></div>
-        <div class="msg">
-            <p style="text-align:center;">
-                确定要删除 模板列表 么？ <br><br>
-                <a href="{{DOMAIN}}admin/temp/clear">确定清空</a>
-                <a href="javascript:void(0);" onclick="getClose()">取消</a>
-            </p>
-        </div>
-    </div>
+    {{--弹出框：删除产品--}}
+    {{--<div class="editproduct" id="editproduct2">--}}
+        {{--<div class="mask"></div>--}}
+        {{--<div class="msg">--}}
+            {{--<p style="text-align:center;">--}}
+                {{--确定要删除 XX产品 么？ <br><br>--}}
+                {{--<a href="{{DOMAIN}}admin/temp/clear">确定清空</a>--}}
+                {{--<a href="javascript:void(0);" onclick="getClose()">取消</a>--}}
+            {{--</p>--}}
+        {{--</div>--}}
+    {{--</div>--}}
 
     <script>
         function getEditPro1(){ $("#editproduct1").show(); }
-        function getEditPro2(){ $("#editproduct2").show(); }
+//        function getEditPro2(){ $("#editproduct2").show(); }
         function getClose(){ $("#editproduct").hide(); }
     </script>
 @stop

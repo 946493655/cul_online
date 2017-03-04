@@ -90,7 +90,7 @@ class Controller extends BaseController
                 'ip'=> $ip,
             ));
             $response = $curl->response;
-            $response = \App\Tools::objectToArray($response);
+            $response = json_decode(json_encode($response),true);
             if ($response['status']==0) {
                 $address = $response['content']['address'];
             }
@@ -105,20 +105,20 @@ class Controller extends BaseController
     /**
      * 上传方法，并处理文件
      */
-    public function upload($file,$suffix)
+    public function upload($file)
     {
         if($file->isValid()){
-            $allowed_extensions = $suffix;
+            $allowed_extensions = $this->suffix_img;
             if ($file->getClientOriginalExtension() &&
                 !in_array($file->getClientOriginalExtension(), $allowed_extensions)) {
                 echo "<script>alert('你的图片格式不对！');history.go(-1);</script>";exit;
             }
             $extension       = $file->getClientOriginalExtension() ?: 'png';
-            $folderName      = 'uploads/images/'.date('Y-m-d', time()).'/';
+            $folderName      = '/uploads/images/'.date('Y-m-d', time()).'/';
             $destinationPath = public_path().$folderName;
             $safeName        = uniqid().'.'.$extension;
             $file->move($destinationPath, $safeName);
-            $filePath = ltrim(DOMAIN,'/').$folderName.$safeName;
+            $filePath = rtrim(DOMAIN,'/').$folderName.$safeName;
             return $filePath;
         } else {
             return "没有图片！";
@@ -141,8 +141,7 @@ class Controller extends BaseController
                 }
             }
             $file = $request->file($imgName);           //获取图片
-            $prefix_url = rtrim(env('DOMAIN'),'/');     //图片访问前缀
-            return $prefix_url.$this->upload($file,$this->suffix_img);
+            return $this->upload($file);
         } else {
             return '';
         }
