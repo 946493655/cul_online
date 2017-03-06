@@ -56,15 +56,22 @@ Route::group(['prefix'=>'admin','middleware' =>'AdminAuth','namespace'=>'Admin']
     Route::post('product/getshow/{pro_id}', 'ProductController@setShow');
     Route::post('product/bg/{pro_id}', 'ProductController@setProBg');
     Route::resource('product', 'ProductController');
+    Route::get('pro/preview/{id}', 'ProductController@getPreview');
+    Route::get('pro/preview/layers/{id}', 'ProductController@getPrePro');
     Route::group(['prefix'=>'pro/{pro_id}'], function(){
         Route::get('layer/{layerid}', 'ProLayerController@show');
         Route::post('layer/tolayer', 'ProLayerController@setLayer');
         Route::post('layer/toattr', 'ProLayerController@setAttr');
         Route::post('layer/totext', 'ProLayerController@setText');
         Route::post('layer/toimg/{layerid}', 'ProLayerController@setImg');
+        Route::get('{layerid}/layer/setshow/{isshow}', 'ProLayerController@setIsShow');
         Route::resource('layer', 'ProLayerController');
     });
     Route::group(['prefix'=>'pro/{pro_id}/{layerid}'], function(){
+        Route::get('prelayer', 'ProFrameController@getPreLayer');
+        Route::get('keyvals', 'ProFrameController@getKeyVals');
+        Route::post('frame/toattr', 'ProFrameController@selAttr');
+        Route::post('frame/setval', 'ProFrameController@setKeyVal');
         Route::resource('frame', 'ProFrameController');
     });
 });

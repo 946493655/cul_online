@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesResources;
+use Illuminate\Http\Request;
 
 class Controller extends BaseController
 {
@@ -128,7 +129,7 @@ class Controller extends BaseController
     /**
      * 只上传图片，返回图片地址
      */
-    public function uploadOnlyImg($request,$imgName='url_ori',$oldImgArr=[])
+    public function uploadOnlyImg(Request $request,$imgName='url_ori',$oldImgArr=[])
     {
         if($request->hasFile($imgName)){        //判断图片存在
             //去除老图片

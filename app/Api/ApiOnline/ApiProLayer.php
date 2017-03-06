@@ -9,13 +9,14 @@ class ApiProLayer
      * 产品动画层接口
      */
 
-    public static function index($pro_id)
+    public static function index($pro_id,$isshow=0)
     {
         $apiUrl = ApiBase::getApiCurl() . '/api/v1/pro/layer';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(
             'pro_id'    =>  $pro_id,
+            'isshow'    =>  $isshow,
         ));
         $response = json_decode($curl->response);
         if ($response->error->code != 0) {
@@ -77,13 +78,12 @@ class ApiProLayer
         );
     }
 
-    public static function setIsShow($uid,$id,$isshow)
+    public static function setIsShow($id,$isshow)
     {
-        $apiUrl = ApiBase::getApiCurl() . '/api/v1/pro/layer/isshow';
+        $apiUrl = ApiBase::getApiCurl() . '/api/v1/pro/layer/setshow';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(
-            'uid'   =>  $uid,
             'id'    =>  $id,
             'isshow'    =>  $isshow,
         ));
@@ -97,13 +97,12 @@ class ApiProLayer
         );
     }
 
-    public static function delete($uid,$id)
+    public static function delete($id)
     {
         $apiUrl = ApiBase::getApiCurl() . '/api/v1/pro/layer/delete';
         $curl = new Curl();
         $curl->setHeader('X-Authorization', ApiBase::getApiKey());
         $curl->post($apiUrl, array(
-            'uid'   =>  $uid,
             'id'    =>  $id,
         ));
         $response = json_decode($curl->response);

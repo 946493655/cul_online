@@ -299,7 +299,6 @@ class LayerController extends BaseController
         }
         //将缓存数据入库
         $data = [
-            'uid'       =>  $this->userid,
             'id'        =>  $layerid,
             'name'      =>  $layerArr['layer']['name'],
             'delay'     =>  $layerArr['layer']['delay'],
@@ -337,7 +336,7 @@ class LayerController extends BaseController
         if (!$pro_id || !$layerid || !$isshow) {
             echo "<script>alert('参数错误！');history.go(-1);</script>";exit;
         }
-        $apiLayer = ApiProLayer::setIsShow($this->userid,$layerid,$isshow);
+        $apiLayer = ApiProLayer::setIsShow($layerid,$isshow);
         if ($apiLayer['code']!=0) {
             echo "<script>alert('".$apiLayer['msg']."');history.go(-1);</script>";exit;
         }

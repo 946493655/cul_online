@@ -42,14 +42,14 @@
     <div id="title">
         <b>动画调节：</b>
         <span style="font-size:14px">(鼠标滚动 | 下面是 [左边时间-右边值] 的组合：时间=百分比x时长)</span>
-        <span style="float:right;" id="titlebtn">
-            <a href="javascript:;" title="增加运动轨迹" style="color:orangered;" onclick="$('#addkey').show(200);">添加关键帧</a>
+        {{--<span style="float:right;" id="titlebtn">--}}
+            {{--<a href="javascript:;" title="增加运动轨迹" style="color:orangered;" onclick="$('#addkey').show(200);">添加关键帧</a>--}}
             {{--@if($frameRedis)--}}
             {{--&nbsp; | &nbsp;--}}
             {{--<a href="javascript:;" title="不保存修改" style="color:orangered;" onclick="cancel()">取消更新</a>&nbsp;--}}
             {{--<a href="javascript:;" title="保存修改" style="color:orangered;" onclick="save()">确定更新</a>--}}
             {{--@endif--}}
-        </span>
+        {{--</span>--}}
     </div>
     <div id="keyframe">
         <div class="left">
@@ -84,7 +84,7 @@
                 <span>%-</span>
                 <input type="text" name="val_{{$left['id']}}" value="{{$left['val']}}" title="修改该值"
                        onchange="setFrame({{$left['id']}})">
-                <input type="button" class="close" title="点击删除该关键帧" value="X" onclick="delFrame({{$left['id']}})">
+                {{--<input type="button" class="close" title="点击删除该关键帧" value="X" onclick="delFrame({{$left['id']}})">--}}
                 <span>，</span> &nbsp;
                 @endforeach
             @else <span style="font-size:16px">没有水平距离关键帧</span>
@@ -177,7 +177,7 @@
 
 <script>
     $.ajaxSetup({headers : {'X-CSRF-TOKEN':$('input[name="_token"]').val()}});
-    var $pro_id = $("input[name='$pro_id']").val();
+    var pro_id = $("input[name='$pro_id']").val();
     var layerid = $("input[name='layerid']").val();
     function selAttr(attr){
         $(".aleft").removeClass("curr"); $("#left_"+attr).addClass("curr");
@@ -219,11 +219,11 @@
                 if (data.code!=0) {
                     alert(data.msg);return;
                 } else {
-                    var html = '<a href="javascript:;" title="增加运动轨迹" style="color:orangered;" onclick="$(\'#addkey\').show(200);">添加关键帧</a> ';
-                    html += '@if($frameRedis)';
-                    html += '&nbsp; | &nbsp; <a href="javascript:;" title="不保存修改" style="color:orangered;" onclick="cancel()">取消更新</a> &nbsp;<a href="javascript:;" title="保存修改" style="color:orangered;" onclick="save()">确定更新</a>';
-                    html += '@endif';
-                    $("#titlebtn").html(html);
+                    {{--var html = '<a href="javascript:;" title="增加运动轨迹" style="color:orangered;" onclick="$(\'#addkey\').show(200);">添加关键帧</a> ';--}}
+                    {{--html += '@if($frameRedis)';--}}
+                    {{--html += '&nbsp; | &nbsp; <a href="javascript:;" title="不保存修改" style="color:orangered;" onclick="cancel()">取消更新</a> &nbsp;<a href="javascript:;" title="保存修改" style="color:orangered;" onclick="save()">确定更新</a>';--}}
+                    {{--html += '@endif';--}}
+                    {{--$("#titlebtn").html(html);--}}
                 }
             }
         });

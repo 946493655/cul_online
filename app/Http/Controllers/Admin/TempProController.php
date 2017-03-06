@@ -271,7 +271,7 @@ class TempProController extends BaseController
         }
         $temp = $apiTemp['data']['temp'];
         $temp['layerNum'] = count($apiTemp['data']['layer']);
-        $apiLayer = ApiTempLayer::index($id,0);
+        $apiLayer = ApiTempLayer::index($id,2);
         if ($apiLayer['code']!=0) {
             echo "<script>alert('没有预览！');history.go(-1);</script>";exit;
         }

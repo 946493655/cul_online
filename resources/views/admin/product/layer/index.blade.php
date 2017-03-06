@@ -19,8 +19,8 @@
                             <span style="color:#4d4d4d;"><b>层面板：</b></span>
                             <a href="javascript:;" id="editbg" title="修改模板大背景"
                                 onclick="getEditBg()">产品背景</a>
-                            <a href="javascript:;" id="addlayer" title="添加新的动画设置"
-                                onclick="getEditPro1()">添加动画</a>
+                            {{--<a href="javascript:;" id="addlayer" title="添加新的动画设置"--}}
+                                {{--onclick="getEditPro1()">添加动画</a>--}}
                             <span style="float:right;">
                                 <a href="{{DOMAIN}}admin/pro/preview/{{$product['id']}}" target="_blank"
                                    title="预览整体动画效果">预览整体</a>
@@ -53,28 +53,28 @@
 
 
     {{--弹出框：添加动画--}}
-    <div class="editproduct" id="editproduct1">
-        <div class="mask"></div>
-        <form action="{{DOMAIN}}admin/pro/{{$product['id']}}/layer" method="POST" data-am-validator>
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="_method" value="POST">
-            <input type="hidden" name="pro_id" value="{{$product['id']}}">
-            <p style="text-align:center"><b>{{$product['name']}} 添加动画</b></p>
-            <p>动画片段名：
-                <input type="text" minlength="2" maxlength="20" required name="name">
-            </p>
-            <p>开始时间点：
-                <input type="text" pattern="^\d+$" required name="delay">
-            </p>
-            <p>时长：
-                <input type="text" pattern="^\d+$" required name="timelong">
-            </p>
-            <p style="text-align:center">
-                <input type="submit" id="submit" title="点击确定更新" value="确定修改">
-            </p>
-            <a href="javascript:void(0);" title="关闭" class="close" onclick="closeEditPro()"> X </a>
-        </form>
-    </div>
+    {{--<div class="editproduct" id="editproduct1">--}}
+        {{--<div class="mask"></div>--}}
+        {{--<form action="{{DOMAIN}}admin/pro/{{$product['id']}}/layer" method="POST" data-am-validator>--}}
+            {{--<input type="hidden" name="_token" value="{{ csrf_token() }}">--}}
+            {{--<input type="hidden" name="_method" value="POST">--}}
+            {{--<input type="hidden" name="pro_id" value="{{$product['id']}}">--}}
+            {{--<p style="text-align:center"><b>{{$product['name']}} 添加动画</b></p>--}}
+            {{--<p>动画片段名：--}}
+                {{--<input type="text" minlength="2" maxlength="20" required name="name">--}}
+            {{--</p>--}}
+            {{--<p>开始时间点：--}}
+                {{--<input type="text" pattern="^\d+$" required name="delay">--}}
+            {{--</p>--}}
+            {{--<p>时长：--}}
+                {{--<input type="text" pattern="^\d+$" required name="timelong">--}}
+            {{--</p>--}}
+            {{--<p style="text-align:center">--}}
+                {{--<input type="submit" id="submit" title="点击确定更新" value="确定添加">--}}
+            {{--</p>--}}
+            {{--<a href="javascript:void(0);" title="关闭" class="close" onclick="closeEditPro()"> X </a>--}}
+        {{--</form>--}}
+    {{--</div>--}}
     {{--弹出框：修改模板总背景--}}
     <div class="editproduct" id="editproduct2">
         <div class="mask"></div>

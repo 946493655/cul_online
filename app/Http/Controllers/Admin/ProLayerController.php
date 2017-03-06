@@ -22,7 +22,7 @@ class ProLayerController extends BaseController
             echo "<script>alert('".$apiProduct['msg']."');history.go(-1);</script>";exit;
         }
         $proAttrArr = $apiProduct['data']['attr'] ? unserialize($apiProduct['data']['attr']) : [];
-        $apiProLayer = ApiProLayer::index($pro_id);
+        $apiProLayer = ApiProLayer::index($pro_id,2);
         //当前操作的动画层
         if (!$layerid) {
             $layerid = $apiProLayer['code']==0 ? $apiProLayer['data'][0]['id'] : 0;
@@ -76,28 +76,28 @@ class ProLayerController extends BaseController
         return view('admin.product.layer.iframe',$result);
     }
 
-    /**
-     * 添加动画层
-     */
-    public function store(Request $request,$pro_id)
-    {
-        $data = [
-            'name'  =>  $request->name,
-            'pro_id'    =>  $request->pro_id,
-            'delay'     =>  $request->delay,
-            'timelong'  =>  $request->timelong,
-        ];
-        $apiProLayer = ApiProLayer::add($data);
-        if ($apiProLayer['code']!=0) {
-            echo "<script>alert('".$apiProLayer['data']."');history.go(-1);</script>";exit;
-        }
-        return redirect(DOMAIN.'admin/pro/'.$pro_id.'/layer');
-    }
+//    /**
+//     * 添加动画层
+//     */
+//    public function store(Request $request,$pro_id)
+//    {
+//        $data = [
+//            'name'  =>  $request->name,
+//            'pro_id'    =>  $request->pro_id,
+//            'delay'     =>  $request->delay,
+//            'timelong'  =>  $request->timelong,
+//        ];
+//        $apiProLayer = ApiProLayer::add($data);
+//        if ($apiProLayer['code']!=0) {
+//            echo "<script>alert('".$apiProLayer['data']."');history.go(-1);</script>";exit;
+//        }
+//        return redirect(DOMAIN.'admin/pro/'.$pro_id.'/layer');
+//    }
 
     /**
      * 动画设置
      */
-    public function setLayer(Request $request)
+    public function setLayer(Request $request,$pro_id)
     {
         if (AjaxRequest::ajax()) {
             if (!$request->name || !$request->timelong) {
@@ -120,7 +120,7 @@ class ProLayerController extends BaseController
     /**
      * 属性设置
      */
-    public function setAttr(Request $request)
+    public function setAttr(Request $request,$pro_id)
     {
         if (AjaxRequest::ajax()) {
             $id = $request->layerid;
@@ -150,7 +150,7 @@ class ProLayerController extends BaseController
     /**
      * 文字设置
      */
-    public function setText(Request $request)
+    public function setText(Request $request,$pro_id)
     {
         if (AjaxRequest::ajax()) {
             $id = $request->layerid;
@@ -160,7 +160,6 @@ class ProLayerController extends BaseController
             $data = [
                 'iscon' =>  $request->iscon,
                 'text'  =>  $request->text,
-                'img'   =>  '',
             ];
             if (!$this->saveToDB($id,array(),array(),$data)) {
                 echo json_encode(array('code'=>-3, 'msg'=>'操作失败！'));exit;
@@ -173,8 +172,38 @@ class ProLayerController extends BaseController
     /**
      * 图片设置
      */
-    public function setImg(Request $request)
+    public function setImg(Request $request,$pro_id,$layerid)
     {
+        if (!array_key_exists('url_ori',$request->all())) {
+            echo "<script>alert('未上传图片！');history.go(-1);</script>";exit;
+        }
+        $rstLayer=ApiProLayer::show($request->pro_id);
+        $oldImgArr = array();
+        if ($rstLayer['code']==0 && $conObj=$rstLayer['data']['con']) {
+            $conArr = unserialize($conObj);
+            if (isset($conArr['img']) && $conArr['img']) {
+                $imgArr1 = explode('/',$conArr['img']);
+                if (mb_substr($imgArr1[0],0,4)=='http') {
+                    unset($imgArr1[0]); unset($imgArr1[1]); unset($imgArr1[2]);
+                    $img1 = implode('/',$imgArr1);
+                } else {
+                    $img1 = ltrim($conArr['img'],'/');
+                }
+                if (file_exists($img1)) { $oldImgArr[] = $img1; }
+            }
+        }
+        $imgStr = $this->uploadOnlyImg($request,'url_ori',$oldImgArr);
+        if (!$imgStr) {
+            echo "<script>alert('图片上传有误！');history.go(-1);</script>";exit;
+        }
+        $data = [
+            'iscon' =>  2,
+            'img'   =>  $imgStr,
+        ];
+        if (!$this->saveToDB($request->layerid,array(),array(),$data)) {
+            echo "<script>alert('操作失败！');history.go(-1);</script>";exit;
+        }
+        return redirect(DOMAIN.'admin/pro/'.$pro_id.'/layer');
     }
 
     /**
@@ -220,6 +249,28 @@ class ProLayerController extends BaseController
             echo "<script>alert('".$apiProLayer2['msg']."');history.go(-1);</script>";exit;
         }
         return redirect(DOMAIN.'admin/pro/'.$apiProLayer['data']['pro_id'].'/layer');
+    }
+
+    /**
+     * 隐藏/显示动画层
+     */
+    public function setIsShow($pro_id,$layerid,$isshow)
+    {
+        if (!$pro_id || !$layerid || !$isshow) {
+            echo "<script>alert('参数错误！');history.go(-1);</script>";exit;
+        }
+        $apiLayer2 = ApiProLayer::index($pro_id,2);
+        if ($apiLayer2['code']!=0 || count($apiLayer2['data'])<2) {
+            echo "<script>alert('至少显示一个动画层！');history.go(-1);</script>";exit;
+        }
+        $apiLayer = ApiProLayer::setIsShow($layerid,$isshow);
+        if ($apiLayer['code']!=0) {
+            echo "<script>alert('".$apiLayer['msg']."');history.go(-1);</script>";exit;
+        }
+        if ($apiLayer['code']!=0) {
+            echo "<script>alert('".$apiLayer['msg']."');history.go(-1);</script>";exit;
+        }
+        return redirect(DOMAIN.'admin/pro/preview/'.$pro_id);
     }
 
     /**

@@ -2,6 +2,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Api\ApiOnline\ApiProduct;
+use App\Api\ApiOnline\ApiProFrame;
+use App\Api\ApiOnline\ApiProLayer;
 use App\Api\ApiOnline\ApiTempPro;
 use App\Api\ApiUser\ApiUsers;
 use Illuminate\Http\Request;
@@ -204,6 +206,49 @@ class ProductController extends BaseController
         echo json_encode(array('code'=>-1, 'msg'=>'参数错误！'));exit;
     }
 
+    /**
+     * 预览整体
+     */
+    public function getPreview($id)
+    {
+        $apiFrame = ApiProFrame::getFramesByProid($id);
+        if ($apiFrame['code']!=0) {
+            echo "<script>alert('没有预览！');history.go(-1);</script>";exit;
+        }
+        $apiProduct = ApiProduct::getPreview($id,2);
+        if ($apiProduct['code']!=0) {
+            echo "<script>alert('".$apiProduct['msg']."');history.go(-1);</script>";exit;
+        }
+        $product = $apiProduct['data']['pro'];
+        $product['layerNum'] = count($apiProduct['data']['layer']);
+        $apiLayer = ApiProLayer::index($id,2);
+        if ($apiLayer['code']!=0) {
+            echo "<script>alert('没有预览！');history.go(-1);</script>";exit;
+        }
+        $result = [
+            'product' => $product,
+            'layers' => $apiLayer['data'],
+        ];
+        return view('admin.product.layer.onepro', $result);
+    }
+
+    /**
+     * 模板的框架载入
+     */
+    public function getPrePro($id)
+    {
+        $apiProduct = ApiProduct::getPreview($id,2);
+        if ($apiProduct['code']!=0) {
+            echo "<script>alert('".$apiProduct['msg']."');history.go(-1);</script>";exit;
+        }
+        $result = [
+            'product' => $apiProduct['data']['pro'],
+            'layers' => $apiProduct['data']['layer'],
+            'layerModel' => $this->getLayerModel(),
+        ];
+        return view('admin.product.layer.prolayers', $result);
+    }
+
 
 
 
@@ -217,6 +262,15 @@ class ProductController extends BaseController
     {
         $apiModel = ApiProduct::getModel();
         return $apiModel['code']==0 ? $apiModel['model'] : [];
+    }
+
+    /**
+     * 获取 model
+     */
+    public function getLayerModel()
+    {
+        $apiLayerModel = ApiProLayer::getModel();
+        return $apiLayerModel['code']==0 ? $apiLayerModel['model'] : [];
     }
 
     /**

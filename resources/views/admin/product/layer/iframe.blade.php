@@ -1,7 +1,7 @@
 <style>
     body { margin:0;padding:0;font-family:'微软雅黑'; }
     /*===div的滚动条修改===*/
-    #menu { margin-top:5px;padding:2px;padding-bottom:20px;width:175px;height:450px;color:grey;background:black;
+    #menu { margin-top:5px;padding:2px;padding-bottom:20px;width:180px;height:450px;color:grey;background:black;
         border-left:1px solid grey;overflow:scroll;position:absolute;top:-10px;left:800px; }
     /*#menu ::-webkit-scrollbar-corner { background:transparent; }*/
     #menu::-webkit-scrollbar { width:5px; }
@@ -164,17 +164,17 @@
         <div class="menutab" id="menu3" style="display:{{(isset($menutab)&&$menutab==3)?'block':'none'}};">
             <label><input type="radio" class="radio" name="iscon1" value="1" {{(!isset($cons['iscon'])||(isset($cons['iscon'])&&$cons['iscon']==1))?'checked':''}} onclick="getCon(1)"> 文字 </label>
             <label><input type="radio" class="radio" name="iscon2" value="2" {{(isset($cons['iscon'])&&$cons['iscon']==2)?'checked':''}} onclick="getCon(2)"> 图片 </label>
-            <input type="hidden" name="iscon" value="{{(isset($cons['iscon'])&&$cons['iscon']==2)?$cons['iscon']:1}}">
 
             <span id="istext"><br>
                 <textarea name="text" id="text" onchange="setText()">{{(isset($cons['iscon'])&&$cons['iscon']==1&&$cons['text'])?$cons['text']:'文字待输入...'}}</textarea>
             </span>
 
-            <form action="{{DOMAIN}}admin/t/{{$product['id']}}/layer/toimg/{{$layers['id']}}" method="POST" data-am-validator enctype="multipart/form-data" id="isimg" style="display:none;">
+            <form action="{{DOMAIN}}admin/pro/{{$product['id']}}/layer/toimg/{{$layers['id']}}" method="POST" data-am-validator enctype="multipart/form-data" id="isimg" style="display:none;">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="_method" value="POST">
                 <input type="hidden" name="pro_id" value="{{$product['id']}}">
                 <input type="hidden" name="layerid" value="{{$layers['id']}}">
+                <input type="hidden" name="iscon" value="{{(isset($cons['iscon'])&&$cons['iscon']==2)?$cons['iscon']:1}}">
                 <script src="{{PUB}}assets/js/local_pre.js"></script>
                 <input type="button" class="submit" value="[ 找图 ]" onclick="path.click()" style="width:90px;cursor:pointer;"><br>
                 <input type="file" id="path" style="display:none" onchange="url_file.value=this.value;loadImageFile();" name="url_ori">
