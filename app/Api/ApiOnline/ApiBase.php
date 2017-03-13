@@ -24,7 +24,7 @@ class ApiBase
     public static function getApiCurl()
     {
 //        return env('API_CURL', 'www.jiugewenhua.com');
-        return 'online_api.jiugewenhua.com';
+        return 'online_api.jiuge_wenhua.com';
     }
 
     /**

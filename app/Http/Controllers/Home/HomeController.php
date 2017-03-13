@@ -16,9 +16,14 @@ class HomeController extends BaseController
 
     public function index($cate=0)
     {
-        $pageCurr = isset($_POST['pageCurr'])?$_POST['pageCurr']:1;
-        $datas = $this->query($pageCurr,$cate);
-        $pagelist = $this->getPageList($datas,DOMAIN,$this->limit,$pageCurr);
+        $pageCurr = isset($_GET['pageCurr'])?$_GET['pageCurr']:1;
+        $apiTemp = ApiTempPro::index($this->limit,$pageCurr,$cate,2);
+        if ($apiTemp['code']!=0) {
+            $datas = array(); $total = 0;
+        } else {
+            $datas = $apiTemp['data']; $total = $apiTemp['pagelist']['total'];
+        }
+        $pagelist = $this->getPageList($total,DOMAIN,$this->limit,$pageCurr);
         $result = [
             'datas' => $datas,
             'pagelist' => $pagelist,
@@ -44,16 +49,7 @@ class HomeController extends BaseController
 
 
 
-    /**
-     * 以下是要展示的数据
-     */
 
-    public function query($pageCurr,$cate=0)
-    {
-        $rst = ApiTempPro::index($this->limit,$pageCurr,$cate,2);
-        $datas = $rst['code']==0?$rst['data']:[];
-        return $datas;
-    }
 
     /**
      * 获取 model

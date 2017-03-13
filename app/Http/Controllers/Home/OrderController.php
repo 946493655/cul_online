@@ -16,11 +16,15 @@ class OrderController extends BaseController
 
     public function index($cate=0)
     {
-        $pageCurr = isset($_POST['pageCurr'])?$_POST['pageCurr']:1;
-        $apiOrder = ApiOrder::index($this->limit,$pageCurr,0,2);
-        $datas = $apiOrder['code']==0 ? $apiOrder['data'] : [];
+        $pageCurr = isset($_GET['pageCurr'])?$_GET['pageCurr']:1;
         $prefix_url = DOMAIN.'o';
-        $pagelist = $this->getPageList($datas,$prefix_url,$this->limit,$pageCurr);
+        $apiOrder = ApiOrder::index($this->limit,$pageCurr,0,2);
+        if ($apiOrder['code']!=0) {
+            $datas = array(); $total = 0;
+        } else {
+            $datas = $apiOrder['data']; $total = $apiOrder['pagelist']['total'];
+        }
+        $pagelist = $this->getPageList($total,$prefix_url,$this->limit,$pageCurr);
         $result = [
             'datas' => $datas,
             'pagelist' => $pagelist,
