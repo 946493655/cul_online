@@ -24,7 +24,7 @@ class OrderController extends BaseController
 
     public function index($cate=0)
     {
-        $pageCurr = isset($_POST['pageCurr'])?$_POST['pageCurr']:1;
+        $pageCurr = isset($_GET['page']) ? $_GET['page'] : 1;
         $apiOrder = ApiOrder::index($this->limit,$pageCurr,$this->userid,$cate,0,2);
         $datas = $apiOrder['code']==0 ? $apiOrder['data'] : [];
         $prefix_url = DOMAIN.'o';

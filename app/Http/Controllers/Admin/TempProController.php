@@ -24,7 +24,7 @@ class TempProController extends BaseController
 
     public function index($cate=0)
     {
-        $pageCurr = isset($_GET['pageCurr'])?$_GET['pageCurr']:1;
+        $pageCurr = isset($_GET['page']) ? $_GET['page'] : 1;
         $prefix_url = DOMAIN.'admin/temp';
         $apiTemp = ApiTempPro::index($this->limit,$pageCurr,$cate);
         if ($apiTemp['code']!=0) {

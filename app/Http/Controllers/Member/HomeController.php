@@ -24,7 +24,7 @@ class HomeController extends BaseController
 
     public function index($cate=0)
     {
-        $pageCurr = isset($_GET['pageCurr'])?$_GET['pageCurr']:1;
+        $pageCurr = isset($_GET['page']) ? $_GET['page'] : 1;
         $apiProduct = ApiProduct::index($this->limit,$pageCurr,$this->userid,$cate,0);
         if ($apiProduct['code']!=0) {
             $datas = array(); $total = 0;
