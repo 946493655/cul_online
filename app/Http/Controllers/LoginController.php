@@ -71,6 +71,9 @@ class LoginController extends BaseController
                 $company['area'] = $companyInfo['data']['area'];
                 $company['address'] = $companyInfo['data']['address'];
                 $company['yyzzid'] = $companyInfo['data']['yyzzid'];
+                $company['logo'] = $companyInfo['data']['logo'];
+                $company['skin'] = $companyInfo['data']['skin'];
+                $company['layout'] = $companyInfo['data']['layout'];
             }
         }
 
@@ -85,8 +88,8 @@ class LoginController extends BaseController
             'address'=> $rstLogin['data']['address'],
             'cid'=> isset($companyInfo['data'])?$companyInfo['data']['id']:0,
             'loginTime'=> time(),
-            'person'=> $person,
-            'company'=> $company,
+            'person'=> isset($person) ? $person : [],
+            'company'=> isset($company) ? $company : [],
         ];
         $userInfo['cookie'] = $_COOKIE;
         Session::put('user',$userInfo);
