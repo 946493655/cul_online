@@ -6,7 +6,7 @@ body { margin:0;font-family:'微软雅黑'; }
 /*=======header头========*/
 .header {
     width:100%;height:30px;
-    background:rgb(240,240,240);
+    background:#f0f0f0;
     position:fixed;z-index:100;top:0;
     border-bottom:1px solid lightgrey;
 }
@@ -40,7 +40,7 @@ body { margin:0;font-family:'微软雅黑'; }
     font-size:14px;
     color:orangered;
     border:1px solid lightgrey;
-    background:rgb(240,240,240);
+    background:#f0f0f0;
 }
 /*=======header头========*/
 
@@ -50,7 +50,7 @@ body { margin:0;font-family:'微软雅黑'; }
     padding:20px 0;
     width:100%;
     height:1050px;
-    background:rgb(40,40,40);
+    background:#282828;
 }
 
 
@@ -58,13 +58,13 @@ body { margin:0;font-family:'微软雅黑'; }
 .online_list {
     margin-top:30px;
     height:900px;
-    background:rgb(40,40,40);
+    background:#282828;
 }
 .online_list .condition {
     padding:5px 0;
     width:100%;
-    border-bottom:1px solid rgb(60,60,60);
-    background:rgb(30,30,30);
+    border-bottom:1px solid #3c3c3c;
+    background:#1e1e1e;
 }
 .online_list .condition .attr {
     margin:5px auto;
@@ -105,11 +105,11 @@ body { margin:0;font-family:'微软雅黑'; }
 .online_list .list .pro_one {
     width:210px; height:140px;
     border:5px solid grey;
-    color:rgb(70,70,70);
+    color:#464646;
     text-align:center;
     line-height:140px;
     font-size:30px;
-    background:rgb(50,50,50);
+    background:#323232;
     overflow:hidden;
 }
 .online_list .list .pname {
@@ -142,7 +142,8 @@ body { margin:0;font-family:'微软雅黑'; }
 .editproduct .mask {
     width:100%;
     height:100%;
-    background:rgba(0,0,0,0.5);
+    background:#000000;
+    filter:alpha(opacity:50); -moz-opacity:0.5;-khtml-opacity:0.5; opacity:0.5;
     position:fixed;left:0;top:0;
 }
 .editproduct form,.editproduct .msg {
@@ -202,15 +203,15 @@ body { margin:0;font-family:'微软雅黑'; }
 .online_list table.list { color:grey; }
 .online_list table.list td {
     padding:5px; padding-top:0;
-    border-bottom:1px dashed rgb(60,60,60);
+    border-bottom:1px dashed #3c3c3c;
 }
 .online_list table.list div#toplay {
     margin:5px auto;
     width:720px; height:480px;
     text-align:center;
     line-height:480px;
-    border:2px solid rgb(50,50,50);
-    background:rgb(30,30,30);
+    border:2px solid #323232;
+    background:#1e1e1e;
     overflow:hidden;
 }
 .online_list table.list .gettemp {
@@ -239,8 +240,8 @@ body { margin:0;font-family:'微软雅黑'; }
 /*模板修改*/
 .list #modifytemp {
     margin-top:10px;
-    border:2px solid rgb(50,50,50);
-    background:rgb(30,30,30);
+    border:2px solid #323232;
+    background:#1e1e1e;
     overflow:hidden;
 }
 
